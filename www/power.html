@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thanos</title>
+<style>
+button {
+	width: 100px;
+	height: 40px;
+	background-color: green;
+	color: white;
+}
+#status {
+	width: 180px;
+	padding: 10px;
+	text-align: center;
+}
+.carregando {
+	background-color: blue;
+	color: white;
+}
+.ligado {
+	background-color: Chartreuse;
+	color: black;
+}
+.desligado {
+	background-color: Crimson;
+	color: white;
+}
+.machine {
+	width: 180px;
+	padding: 10px;
+	text-align: center;
+	background-color: #008080;
+	color: white;
+}
+
+</style>
+<script>
+PIN_POWER = 2;
+PIN_RELAY = 1;
+async function getStatus(msg) {
+  var s = document.getElementById("status");
+  if(s.classList.contains("ligado")) s.classList.remove("ligado");
+  if(s.classList.contains("desligado")) s.classList.remove("desligado");
+  s.innerHTML = "Status: " + msg;
+  s.classList.add("carregando");
+  const response = await fetch("/inputs");
+  const json = await response.json();
+  console.log(status);
+  status = (json.inputs.substring(PIN_POWER, PIN_POWER+1)=='1')?'ON':'OFF';
+  s.innerHTML = "Status: " + status;
+  s.classList.remove("carregando");
+  if(status == "ON") {
+    s.classList.add("ligado");
+  } else {
+    s.classList.add("desligado");
+  }
+}
+async function liga() {
+  const response = await fetch("/relay/" + PIN_RELAY + "/PULSE_ON");
+  const json = await response.json();
+  status = (json.inputs.substring(PIN_POWER, PIN_POWER+1)=='1')?'ON':'OFF';
+  console.log(status);
+  getStatus("ligando...");
+}
+async function desliga() {
+  const response = await fetch("/relay/" + PIN_RELAY + "/PULSE_OFF");
+  const json = await response.json();
+  status = (json.inputs.substring(PIN_POWER, PIN_POWER+1)=='1')?'ON':'OFF';
+  console.log(status);
+  getStatus("desligando...");
+}
+window.addEventListener("load", function () {
+  getStatus("aguarde...");
+});
+</script>
+</head>
+
+<body>
+<h1>Server: thanos</h1>
+
+<div>
+<button onclick='liga();'>ON</button>
+<button onclick='desliga();'>OFF</button>
+</div>
+<p></p>
+<div id="status" class="carregando">Status: ---</div>
+<p></p>
+<div class="machine">IP: 192.168.1.6</div>
+<div class="machine">SO: debian 12</div>
+</body>
+
+</html>

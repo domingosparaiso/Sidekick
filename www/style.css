@@ -1,0 +1,47 @@
+.titulo {
+	color: gray;
+	font-size: 20;
+}
+.menu {
+	display: flex;
+	border-style: solid;
+	border-width: 1px;	
+}
+.testb {
+	text-align: center;
+	border-style: solid;
+	border-width: 1px;
+	padding: 2px;
+	background-color: gray;
+}
+.grupo {
+	font-size: 15;
+	color: #A0A0A0;
+	vertical-align: top;
+	display: flex;
+	padding: 5px;
+}
+.separador {
+	border-style: solid;
+	border-width: 0px 1px 0px 0px;
+	border-color: black;
+	padding-right: 5px;
+}
+.item-menu-principal {
+	padding: 5px;
+	font-size: 20px;
+	color: blue;
+	text-decoration-line: underline;text-decoration-line: underline;
+	cursor: pointer;
+}
+.item-menu-auxiliar {
+	padding: 5px;
+	font-size: 15px;
+	color: red;
+	text-decoration-line: underline;text-decoration-line: underline;
+	cursor: pointer;
+}
+.janela {
+	display: none;
+	background-color: #F0F0F0;
+}

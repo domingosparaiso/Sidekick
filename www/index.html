@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+<script src="scripts.js"></script>
+</head>
+<body onload="update_config();">
+<img src='/logo.png'>
+<h2>Menu de Configura&ccedil;&atilde;o</h2>
+<h4>Sidekick</h4>
+<div class=menu>
+	<div class=item-menu-principal onclick="show('menu-info','main');">
+		Informa&ccedil;&otilde;es
+	</div>
+	<div class=item-menu-principal onclick="show('menu-config','main');">
+		Configura&ccedil;&atilde;o
+	</div>
+	<div class=item-menu-principal onclick="show('menu-teste','main');">
+		Teste de hardware
+	</div>
+	<div class=item-menu-principal onclick="show('menu-update','main');">
+		Update
+	</div>
+	<div class=item-menu-principal onclick='filesystem();'>
+		Arquivos
+	</div>
+	<div class=item-menu-principal onclick='reboot();'>
+		Reboot
+	</div>
+</div>
+<iframe id="formnull" name="formnull" style="display:none"></iframe>
+<form method='POST' action='/config' target='formnull'>
+
+<div class=janela id='menu-info'>
+	<h3 id='version'></h3>
+	<h3 id='serialNumber'></h3>
+</div>
+
+<div class=janela id='menu-config'>
+	<div class=titulo>Configura&ccedil;&atilde;o</div>
+	<div class=menu>
+		<div class=item-menu-auxiliar onclick="show('tab-server','');">
+			Servidor
+		</div>
+		<div class=separador></div>
+		<div class=grupo>Wifi
+			<div class=item-menu-auxiliar onclick="show('tab-wifi-cli','');">
+				Client
+			</div>
+			<div class=item-menu-auxiliar onclick="show('tab-wifi-ap','');">
+				Access Point
+			</div>
+		</div>
+		<div class=separador></div>
+		<div class=item-menu-auxiliar onclick="show('tab-password','');">
+			Senha
+		</div>
+		<div class=separador></div>
+		<div class=item-menu-auxiliar onclick="show('tab-hardware','');">
+			Hardware
+		</div>
+		<div class=separador></div>
+		<div class=item-menu-auxiliar>
+			<input type=submit value=' Salvar configura&ccedil;&atilde;o '>
+		</div>
+	</div>
+</div>
+
+<div class=janela id='tab-server'>
+<div class=titulo>Identifica&ccedil;&atilde;o do Servidor</div>
+<table>
+<tr><td colspan=2>Informar a identifica&ccedil;&atilde;o do servidor</tr></td>
+<tr><td>Nome</td><td><input name='serverName' id='serverName' size=32></td></tr>
+</table>
+</div>
+
+<div class=janela id='tab-wifi-cli'>
+<div class=titulo>Par&acirc;metros Wifi - Modo Cliente</div>
+<table>
+<tr><td>SSID</td><td><input name='CLI_wifi_SSID' id='CLI_wifi_SSID' type=text size=32></td></tr>
+<tr><td>Senha</td><td><input name='CLI_wifi_password' id='CLI_wifi_password' type=text size=32></td></tr>
+<tr><td colspan=2>TCP/IP: 
+<input type='radio' name='CLI_DHCP' id='CLI_DHCP1' value='dhcp' checked onclick='desabilita_addr(true);'>
+<label for='CLI_DHCP1'>DHCP</label>
+<input type='radio' name='CLI_DHCP' id='CLI_DHCP2' value='fixo' onclick='desabilita_addr(false);'>
+<label for='CLI_DHCP2'>Fixo</label>
+</td></tr>
+<tr><td>Endere&ccedil;o</td><td>
+<input name='CLI_IP_1' id='CLI_IP_1' type=text size=3 disabled>.
+<input name='CLI_IP_2' id='CLI_IP_2' type=text size=3 disabled>.
+<input name='CLI_IP_3' id='CLI_IP_3' type=text size=3 disabled>.
+<input name='CLI_IP_4' id='CLI_IP_4' type=text size=3 disabled>
+</td></tr>
+<tr><td>M&aacute;scara</td><td>
+<input name='CLI_MASK_1' id='CLI_MASK_1' type=text size=3 disabled>.
+<input name='CLI_MASK_2' id='CLI_MASK_2' type=text size=3 disabled>.
+<input name='CLI_MASK_3' id='CLI_MASK_3' type=text size=3 disabled>.
+<input name='CLI_MASK_4' id='CLI_MASK_4' type=text size=3 disabled>
+</td></tr>
+<tr><td>Gateway</td><td>
+<input name='CLI_GW_1' id='CLI_GW_1' type=text size=3 disabled>.
+<input name='CLI_GW_2' id='CLI_GW_2' type=text size=3 disabled>.
+<input name='CLI_GW_3' id='CLI_GW_3' type=text size=3 disabled>.
+<input name='CLI_GW_4' id='CLI_GW_4' type=text size=3 disabled>
+</td></tr>
+<tr><td>DNS</td><td>
+<input name='CLI_DNS_1' id='CLI_DNS_1' type=text size=3 disabled>.
+<input name='CLI_DNS_2' id='CLI_DNS_2' type=text size=3 disabled>.
+<input name='CLI_DNS_3' id='CLI_DNS_3' type=text size=3 disabled>.
+<input name='CLI_DNS_4' id='CLI_DNS_4' type=text size=3 disabled>
+</td></tr>
+</table>
+</div>
+
+<div class=janela id='tab-wifi-ap'>
+<div class=titulo>Par&acirc;metros Wifi - Modo Access Point</div>
+<table>
+<tr><td>SSID</td><td><input name='AP_SSID' id='AP_SSID' type=text size=32></td></tr>
+<tr><td>Senha</td><td><input name='AP_password' id='AP_password' type=text size=32></td></tr>
+</table>
+</div>
+
+<div class=janela id='tab-password'>
+<div class=titulo>Senha de configura&ccedil;&atilde;o</div>
+<table>
+<tr><td colspan=2>Senha usada para entrar no modo de configura&ccedil;&atilde;o</tr></td>
+<tr><td>Senha</td><td><input name='password' id='password' type=text size=20></td></tr>
+</table>
+</div>
+
+<div class=janela id='tab-hardware'>
+<div class=titulo>Hardware - Mapeamento das portas de I/O</div>
+Portas do controlador: 16,17,18,19,4,21,22,23
+<table>
+<tr><td>Entrada Digital</td><td>Porta</td><td></td><td>Rel&eacute;</td><td>Porta</td></tr>
+<tr>
+	<td>[1]</td>
+	<td><input name='digitalInput_1' type=text id='digitalInput_1' size=2></td>
+	<td>&nbsp;</td>
+	<td>[1]</td>
+	<td><input name='relayOutput_1' type=text id='relayOutput_1' size=2></td>
+</tr>
+<tr>
+	<td>[2]</td>
+	<td><input name='digitalInput_2' type=text id='digitalInput_2' size=2></td>
+	<td>&nbsp;</td>
+	<td>[2]</td>
+	<td><input name='relayOutput_2' type=text id='relayOutput_2' size=2></td>
+</tr>
+<tr>
+	<td>[3]</td><td>
+	<input name='digitalInput_3' type=text id='digitalInput_3' size=2></td>
+	<td>&nbsp;</td>
+	<td>[3]</td>
+	<td><input name='relayOutput_3' type=text id='relayOutput_3' size=2></td>
+</tr>
+<tr>
+	<td>[4]</td>
+	<td><input name='digitalInput_4' type=text id='digitalInput_4' size=2></td>
+	<td>&nbsp;</td>
+	<td>[4]</td>
+	<td><input name='relayOutput_4' type=text id='relayOutput_4' size=2></td>
+</tr>
+</table>
+</div>
+</form>
+
+<div class=janela id='menu-teste'>
+<div class=titulo>Teste de Hardware</div>
+<form id='teste'>
+<table>
+<tr><td>Bot&otilde;es</td>
+<td width=15%><div class='testb' id='tb1'>1</div></td>
+<td width=15%><div class='testb' id='tb2'>2</div></td>
+<td width=15%><div class='testb' id='tb3'>3</div></td>
+<td width=15%><div class='testb' id='tb4'>4</div></td>
+<td width=15%><div class='testb' id='tb5'>CFG</div></td>
+</tr>
+<tr><td>Rel&eacute;s</td>
+<td align=center><input type=button value='   1   ' onclick='test_rl(1);'></td>
+<td align=center><input type=button value='   2   ' onclick='test_rl(2);'></td>
+<td align=center><input type=button value='   3   ' onclick='test_rl(3);'></td>
+<td align=center><input type=button value='   4   ' onclick='test_rl(4);'></td>
+<td></td>
+</tr>
+<tr><td>LEDs</td>
+<td><input id='ld1' type=button value=' STA ' onclick='test_led(1);'></td>
+<td><input id='ld2' type=button value=' CFG ' onclick='test_led(2);'></td>
+<td colspan=3></td>
+</tr>
+<tr><td colspan=5><div id=lista-wifi></div></td></tr>
+</table>
+</form>
+</div>
+
+<div class=janela id='menu-update'>
+<div class=titulo>Update firmware</div>
+<a href='/upload'>Clique aqui para entrar na p&aacute;gina de update de firmware...</a>
+</div>
+</body>
+</html>
