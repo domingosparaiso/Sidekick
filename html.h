@@ -1,3 +1,6 @@
+#ifndef HTML_H
+#define HTML_H 1
+
 const char *uploadHtml = R"literal(
   <!DOCTYPE html>
   <body style='width:480px'>
@@ -95,3 +98,5 @@ function formatar() {
 }
 </script>
 )literal";
+
+#endif

@@ -1,39 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <link rel="stylesheet" href="style.css">
 <script src="scripts.js"></script>
 </head>
-<body onload="update_config();">
-<img src='/logo.png'>
-<h2>Menu de Configura&ccedil;&atilde;o</h2>
-<h4>Sidekick</h4>
-<div class=menu>
-	<div class=item-menu-principal onclick="show('menu-info','main');">
-		Informa&ccedil;&otilde;es
-	</div>
-	<div class=item-menu-principal onclick="show('menu-config','main');">
-		Configura&ccedil;&atilde;o
-	</div>
-	<div class=item-menu-principal onclick="show('menu-teste','main');">
-		Teste de hardware
-	</div>
-	<div class=item-menu-principal onclick="show('menu-update','main');">
-		Update
-	</div>
-	<div class=item-menu-principal onclick='filesystem();'>
-		Arquivos
-	</div>
-	<div class=item-menu-principal onclick='reboot();'>
-		Reboot
+<body>
+<img src='/logo.png' onclick='show_hide_main_menu();'>
+<div id='top-menu'>
+	<div class=menu>
+		<div class=item-menu-principal onclick="show('menu-controle','main');">
+			Controle
+		</div>
+		<div class=item-menu-principal onclick="show('menu-config','main');">
+			Configura&ccedil;&atilde;o
+		</div>
+		<div class=item-menu-principal onclick="show('menu-update','main');">
+			Update
+		</div>
+		<div class=item-menu-principal onclick='filesystem();'>
+			Arquivos
+		</div>
+		<div class=item-menu-principal onclick='reboot();'>
+			Reboot
+		</div>
 	</div>
 </div>
 <iframe id="formnull" name="formnull" style="display:none"></iframe>
-<form method='POST' action='/config' target='formnull'>
+<form method='POST' action='/config' target='formnull' onsubmit='getports();'>
 
-<div class=janela id='menu-info'>
-	<h3 id='version'></h3>
-	<h3 id='serialNumber'></h3>
+<div class=janela id='menu-controle'>
+	<h3 id='information'></h3>
+	<div id='control'></div>
 </div>
 
 <div class=janela id='menu-config'>
@@ -52,10 +50,6 @@
 			</div>
 		</div>
 		<div class=separador></div>
-		<div class=item-menu-auxiliar onclick="show('tab-password','');">
-			Senha
-		</div>
-		<div class=separador></div>
 		<div class=item-menu-auxiliar onclick="show('tab-hardware','');">
 			Hardware
 		</div>
@@ -71,6 +65,8 @@
 <table>
 <tr><td colspan=2>Informar a identifica&ccedil;&atilde;o do servidor</tr></td>
 <tr><td>Nome</td><td><input name='serverName' id='serverName' size=32></td></tr>
+<tr><td colspan=2>Senha usada para entrar no modo de configura&ccedil;&atilde;o</tr></td>
+<tr><td>Senha</td><td><input name='password' id='password' type=text size=20></td></tr>
 </table>
 </div>
 
@@ -120,78 +116,15 @@
 </table>
 </div>
 
-<div class=janela id='tab-password'>
-<div class=titulo>Senha de configura&ccedil;&atilde;o</div>
-<table>
-<tr><td colspan=2>Senha usada para entrar no modo de configura&ccedil;&atilde;o</tr></td>
-<tr><td>Senha</td><td><input name='password' id='password' type=text size=20></td></tr>
-</table>
-</div>
-
 <div class=janela id='tab-hardware'>
 <div class=titulo>Hardware - Mapeamento das portas de I/O</div>
-Portas do controlador: 16,17,18,19,4,21,22,23
-<table>
-<tr><td>Entrada Digital</td><td>Porta</td><td></td><td>Rel&eacute;</td><td>Porta</td></tr>
-<tr>
-	<td>[1]</td>
-	<td><input name='digitalInput_1' type=text id='digitalInput_1' size=2></td>
-	<td>&nbsp;</td>
-	<td>[1]</td>
-	<td><input name='relayOutput_1' type=text id='relayOutput_1' size=2></td>
-</tr>
-<tr>
-	<td>[2]</td>
-	<td><input name='digitalInput_2' type=text id='digitalInput_2' size=2></td>
-	<td>&nbsp;</td>
-	<td>[2]</td>
-	<td><input name='relayOutput_2' type=text id='relayOutput_2' size=2></td>
-</tr>
-<tr>
-	<td>[3]</td><td>
-	<input name='digitalInput_3' type=text id='digitalInput_3' size=2></td>
-	<td>&nbsp;</td>
-	<td>[3]</td>
-	<td><input name='relayOutput_3' type=text id='relayOutput_3' size=2></td>
-</tr>
-<tr>
-	<td>[4]</td>
-	<td><input name='digitalInput_4' type=text id='digitalInput_4' size=2></td>
-	<td>&nbsp;</td>
-	<td>[4]</td>
-	<td><input name='relayOutput_4' type=text id='relayOutput_4' size=2></td>
-</tr>
-</table>
+<input name='ports' id='ports' type='hidden'>
+<input name='types' id='types' type='hidden'>
+<input name='connections' id='connections' type='hidden'>
+<div id='hardware-table'>
+</div>
 </div>
 </form>
-
-<div class=janela id='menu-teste'>
-<div class=titulo>Teste de Hardware</div>
-<form id='teste'>
-<table>
-<tr><td>Bot&otilde;es</td>
-<td width=15%><div class='testb' id='tb1'>1</div></td>
-<td width=15%><div class='testb' id='tb2'>2</div></td>
-<td width=15%><div class='testb' id='tb3'>3</div></td>
-<td width=15%><div class='testb' id='tb4'>4</div></td>
-<td width=15%><div class='testb' id='tb5'>CFG</div></td>
-</tr>
-<tr><td>Rel&eacute;s</td>
-<td align=center><input type=button value='   1   ' onclick='test_rl(1);'></td>
-<td align=center><input type=button value='   2   ' onclick='test_rl(2);'></td>
-<td align=center><input type=button value='   3   ' onclick='test_rl(3);'></td>
-<td align=center><input type=button value='   4   ' onclick='test_rl(4);'></td>
-<td></td>
-</tr>
-<tr><td>LEDs</td>
-<td><input id='ld1' type=button value=' STA ' onclick='test_led(1);'></td>
-<td><input id='ld2' type=button value=' CFG ' onclick='test_led(2);'></td>
-<td colspan=3></td>
-</tr>
-<tr><td colspan=5><div id=lista-wifi></div></td></tr>
-</table>
-</form>
-</div>
 
 <div class=janela id='menu-update'>
 <div class=titulo>Update firmware</div>

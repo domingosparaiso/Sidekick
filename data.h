@@ -1,3 +1,6 @@
+#ifndef DATA_H
+#define DATA_H 1
+
 struct wifi_config {
   char SSID[32];
   char password[32];
@@ -17,11 +20,17 @@ struct config_data {
   char password[32];
   wifi_config AP;
   wifi_client CLI;
-  uint8_t digitalInput[4];
-  uint8_t relayOutput[4];
+  uint8_t deviceCount;
+  uint8_t devicePort[MAX_DEVICES];
+  uint8_t deviceType[MAX_DEVICES];
+  uint8_t deviceConnection[MAX_DEVICES];
 };
 
 union config_union {
   byte raw[sizeof(config_data)];
   config_data data;
 };
+
+void load_CFG();
+
+#endif

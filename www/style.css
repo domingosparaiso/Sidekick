@@ -2,17 +2,15 @@
 	color: gray;
 	font-size: 20;
 }
+
+#top-menu {
+	display: none;
+}
+
 .menu {
 	display: flex;
 	border-style: solid;
-	border-width: 1px;	
-}
-.testb {
-	text-align: center;
-	border-style: solid;
 	border-width: 1px;
-	padding: 2px;
-	background-color: gray;
 }
 .grupo {
 	font-size: 15;
