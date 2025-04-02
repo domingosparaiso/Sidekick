@@ -23,22 +23,22 @@ void handleUpdate() {
   }
   HTTPUpload &upload = server.upload();
   if (upload.status == UPLOAD_FILE_START) {
-      oled_status(OLED_UPLOAD_FILE_START);
+      display_status(STATUS_UPLOAD_FILE_START);
     if (!Update.begin(fsize)) {
       otaDone = 0;
     }
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
-      oled_status(OLED_UPLOAD_FILE_RUN);
+      display_status(STATUS_UPLOAD_FILE_RUN);
     } else {
       otaDone = 100 * Update.progress() / Update.size();
-      oled_print(2,String(otaDone));
+      display_print(2, 1, String(otaDone));
     }
   } else if (upload.status == UPLOAD_FILE_END) {
     if (Update.end(true)) {
-      oled_status(OLED_UPLOAD_FILE_OK);
+      display_status(STATUS_UPLOAD_FILE_OK);
     } else {
-      oled_status(OLED_UPLOAD_FILE_ERROR);
+      display_status(STATUS_UPLOAD_FILE_ERROR);
       otaDone = 0;
     }
   }
@@ -106,7 +106,7 @@ void configServerInit() {
   // Reiniciar o dispositivo sem alterações
   server.on("/reboot", HTTP_GET, []() {
     server.send(200, "text/html", "<html><body><h1>Reboot in progress...</h1></body></html>");
-    oled_status(OLED_REBOOT);
+    display_status(STATUS_REBOOT);
     ESP.restart();
   });
 
@@ -155,7 +155,7 @@ void configServerInit() {
       handleUpdateEnd();
     },
     []() {
-      oled_status(OLED_UPDATE_FIRMWARE);
+      display_status(STATUS_UPDATE_FIRMWARE);
       handleUpdate();
     }
   );
@@ -178,13 +178,13 @@ void configServerInit() {
 
   // formatar o SPIFFS
   server.on("/format", []() {
-    oled_status(OLED_FORMAT_FS);
+    display_status(STATUS_FORMAT_FS);
     if(SPIFFS.format()) {
       server.send(200, "text/html", "<html><body>Armazenamento Flash formatado.<hr><a href=/home>Home</a></body></html>");
-      oled_status(OLED_FORMAT_OK);
+      display_status(STATUS_FORMAT_OK);
     } else {
       server.send(200, "text/html", "<html><body>Falha ao formatar o armazenamento Flash.<hr><a href=/home>Home</a></body></html>");
-      oled_status(OLED_FORMAT_ERROR);
+      display_status(STATUS_FORMAT_ERROR);
     }
   });
 

@@ -55,50 +55,33 @@ void rpm_init() {
   #endif
 }
 
-void update_rpm(rpm_data FAN, long millis_count){
+void update_rpm(volatile rpm_data& FAN, long millis_count){
   long counter;
   long tempo;
   counter = FAN.counter;
   FAN.counter = 0;
-  tempo = millis_count - FAN.milils;
-  FAN.milils = 0;
+  tempo = millis_count - FAN.millis;
+  FAN.millis = 0;
   if(tempo > 0) FAN.rpm = (counter/tempo);
 }
 
 void updateRPMs() {
   long millis_count = millis();
   #ifdef RPM_CPU_PIN
-    update(FAN_CPU, millis_count);
+    update_rpm(FAN_CPU, millis_count);
   #endif
   #ifdef RPM_SYS1_PIN
-    update(FAN_SYS1, millis_count);
+    update_rpm(FAN_SYS1, millis_count);
   #endif
   #ifdef RPM_SYS2_PIN
-    update(FAN_SYS2, millis_count);
+    update_rpm(FAN_SYS2, millis_count);
   #endif
   #ifdef RPM_SYS3_PIN
-    update(FAN_SYS3, millis_count);
+    update_rpm(FAN_SYS3, millis_count);
   #endif
   #ifdef RPM_SYS4_PIN
-    update(FAN_SYS4, millis_count);
+    update_rpm(FAN_SYS4, millis_count);
   #endif
-}
-
-long rpm_get(int rpmdevice) {
-  long rpm = 0;
-  switch(rpmdevice) {
-    case DEV_CONNECTION_CPU:
-      rpm = RPM_CPU;
-      break;
-    case DEV_CONNECTION_SYSTEM1:
-    case DEV_CONNECTION_SYSTEM2:
-    case DEV_CONNECTION_SYSTEM3:
-    case DEV_CONNECTION_SYSTEM4:
-      int i = rpmdevice - DEV_CONNECTION_SYSTEM1;
-      rpm = RPM_SYS[i];
-      break;
-  }
-  return(rpm);
 }
 
 void rpm_register() {

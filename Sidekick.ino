@@ -76,11 +76,11 @@ void wifi_connect(int connection_type) {
     Serial.println(CFG.data.CLI.wifi.password);
     Serial.print(F("Conectando rede wifi "));
     Serial.print(CFG.data.CLI.wifi.SSID);
-    int status_oled = OLED_CONFIG_WIFI_1;
+    int status_oled = STATUS_CONFIG_WIFI_1;
     int retry_count = 50;
     while (WiFi.status() != WL_CONNECTED) {
-      oled_status(status_oled);
-      status_oled = (status_oled==OLED_CONFIG_WIFI_1)?OLED_CONFIG_WIFI_2:OLED_CONFIG_WIFI_1;
+      display_status(status_oled);
+      status_oled = (status_oled==STATUS_CONFIG_WIFI_1)?STATUS_CONFIG_WIFI_2:STATUS_CONFIG_WIFI_1;
       Serial.print(".");
       delay(500);
       if(retry_count-- < 0) break;
@@ -88,9 +88,9 @@ void wifi_connect(int connection_type) {
     Serial.println("");
     if(WiFi.status() != WL_CONNECTED) {
       Serial.println(F("Conexao wifi... [Falha]"));
-      oled_status(OLED_CONFIG_WIFI_ERROR);
+      display_status(STATUS_CONFIG_WIFI_ERROR);
     } else {
-      oled_status(OLED_CONFIG_WIFI_OK);
+      display_status(STATUS_CONFIG_WIFI_OK);
       if(!CFG.data.CLI.DHCP) {
         IPAddress ip(CFG.data.CLI.IP[0], CFG.data.CLI.IP[1], CFG.data.CLI.IP[2], CFG.data.CLI.IP[3]);
         IPAddress gateway(CFG.data.CLI.GW[0], CFG.data.CLI.GW[1], CFG.data.CLI.GW[2], CFG.data.CLI.GW[3]);
@@ -101,8 +101,8 @@ void wifi_connect(int connection_type) {
       Serial.print(F("Conectado: "));
       Serial.print(WiFi.localIP().toString());
       Serial.println(F("... [OK]"));
-      oled_print(1, F("Conectado"));
-      oled_print(2, WiFi.localIP().toString());
+      display_print(1, 1, F("Conectado"));
+      display_print(2, 1, WiFi.localIP().toString());
     }
   } else {
     Serial.println(F("Iniciando wifi AP"));
@@ -126,23 +126,23 @@ void wifi_connect(int connection_type) {
       if (!WiFi.softAP(CFG.data.AP.SSID, CFG.data.AP.password)) {
         Serial.println(F("Erro definindo Wifi AP em modo recuperacao"));
         Serial.println(F("O sistema sera reiniciado em 10s"));
-        oled_print(1,F("Wifi AP Erro"));
-        oled_print(2,F("<reboot>"));
+        display_print(1, 1, F("Wifi AP Erro"));
+        display_print(2, 1, F("<reboot>"));
         delay(10000);
         Serial.println(F("<reboot>"));
-        oled_status(OLED_REBOOT);
+        display_status(STATUS_REBOOT);
         ESP.restart();
       }
     }
     WiFi.softAPConfig(AP_LOCAL_IP, AP_GATEWAY_IP, AP_NETWORK_MASK);
-    oled_print(1, CFG.data.AP.SSID);
-    oled_print(2, CFG.data.AP.password);
+    display_print(1, 1, CFG.data.AP.SSID);
+    display_print(2, 1, CFG.data.AP.password);
     wifi_method = AP_WIFI;
     Serial.print(F("Conectado: "));
     Serial.print(WiFi.localIP());
     Serial.println(F("... [OK]"));
-    oled_print(1, F("Conectado"));
-    oled_print(2, WiFi.localIP().toString());
+    display_print(1, 1, F("Conectado"));
+    display_print(2, 1, WiFi.localIP().toString());
   }
 }
 

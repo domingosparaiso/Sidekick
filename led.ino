@@ -15,25 +15,25 @@ void led_init() {
 
 #ifdef LED_POWER_PIN
   bool led_power() {
-    return(digitalRead(PIN_POWER_LED) == HIGH);
+    return(digitalRead(LED_POWER_PIN) == HIGH);
   }
 #endif
 
 #ifdef LED_HDD_PIN
   bool led_hdd() {
-    return(digitalRead(PIN_HDD_LED) == HIGH);
+    return(digitalRead(LED_HDD_PIN) == HIGH);
   }
 #endif
 
 void led_register() {
   #ifdef LED_POWER_PIN
   server.on("/led/power", HTTP_GET, []() {
-    server.send(200, "application/json", "{ \"led_power\": \"" + led_power()?"ON":"OFF" + "\"}");
+    server.send(200, "application/json", "{ \"led_power\": \"" + String(led_power()?"ON":"OFF") + "\"}");
   });
   #endif
   #ifdef LED_HDD_PIN
   server.on("/led/hdd", HTTP_GET, []() {
-    server.send(200, "application/json", "{ \"led_hdd\": \"" + led_hdd()?"ON":"OFF" + "\"}");
+    server.send(200, "application/json", "{ \"led_hdd\": \"" + String(led_hdd()?"ON":"OFF") + "\"}");
   });
   #endif
 }

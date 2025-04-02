@@ -43,50 +43,50 @@
 
 #ifdef RELAY_POWER_LEVEL_ON
   #if RELAY_POWER_LEVEL_ON == HIGH
-    #define RELAY_POWER_LEVEL_OFF=LOW
+    #define RELAY_POWER_LEVEL_OFF LOW
   #else
-    #define RELAY_POWER_LEVEL_OFF=HIGH
+    #define RELAY_POWER_LEVEL_OFF HIGH
   #endif
 #endif
 #ifdef RELAY_RESET_LEVEL_ON
   #if RELAY_RESET_LEVEL_ON == HIGH
-    #define RELAY_RESET_LEVEL_OFF=LOW
+    #define RELAY_RESET_LEVEL_OFF LOW
   #else
-    #define RELAY_RESET_LEVEL_OFF=HIGH
+    #define RELAY_RESET_LEVEL_OFF HIGH
   #endif
 #endif
 #ifdef RELAY_SYS1_LEVEL_ON
   #if RELAY_SYS1_LEVEL_ON == HIGH
-    #define RELAY_SYS1_LEVEL_OFF=LOW
+    #define RELAY_SYS1_LEVEL_OFF LOW
   #else
-    #define RELAY_SYS1_LEVEL_OFF=HIGH
+    #define RELAY_SYS1_LEVEL_OFF HIGH
   #endif
 #endif
 #ifdef RELAY_SYS2_LEVEL_ON
   #if RELAY_SYS2_LEVEL_ON == HIGH
-    #define RELAY_SYS2_LEVEL_OFF=LOW
+    #define RELAY_SYS2_LEVEL_OFF LOW
   #else
-    #define RELAY_SYS2_LEVEL_OFF=HIGH
+    #define RELAY_SYS2_LEVEL_OFF HIGH
   #endif
 #endif
 #ifdef RELAY_SYS3_LEVEL_ON
   #if RELAY_SYS3_LEVEL_ON == HIGH
-    #define RELAY_SYS3_LEVEL_OFF=LOW
+    #define RELAY_SYS3_LEVEL_OFF LOW
   #else
-    #define RELAY_SYS3_LEVEL_OFF=HIGH
+    #define RELAY_SYS3_LEVEL_OFF HIGH
   #endif
 #endif
 #ifdef RELAY_SYS4_LEVEL_ON
   #if RELAY_SYS4_LEVEL_ON == HIGH
-    #define RELAY_SYS4_LEVEL_OFF=LOW
+    #define RELAY_SYS4_LEVEL_OFF LOW
   #else
-    #define RELAY_SYS4_LEVEL_OFF=HIGH
+    #define RELAY_SYS4_LEVEL_OFF HIGH
   #endif
 #endif
 
 struct rpm_data {
   long counter;
-  long milils;
+  long millis;
   long rpm;
 };
 

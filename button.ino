@@ -62,17 +62,17 @@ void button_init() {
 void button_register() {
   #ifdef BUTTON_POWER_PIN
   server.on("/button/power", HTTP_GET, []() {
-    server.send(200, "application/json", "{ \"button_power\": \"" + button_power()?"ON":"OFF" + "\"}");
+    server.send(200, "application/json", "{ \"button_power\": \"" + String(button_power()?"ON":"OFF") + "\"}");
   });
   #endif
   #ifdef BUTTON_POWER_PIN
   server.on("/button/reset", HTTP_GET, []() {
-    server.send(200, "application/json", "{ \"button_reset\": \"" + button_reset()?"ON":"OFF" + "\"}");
+    server.send(200, "application/json", "{ \"button_reset\": \"" + String(button_reset()?"ON":"OFF") + "\"}");
   });
   #endif
-  #ifdef (BUTTON_RECONFIGURE_PIN
+  #ifdef BUTTON_RECONFIGURE_PIN
   server.on("/button/reconfigure", HTTP_GET, []() {
-    server.send(200, "application/json", "{ \"button_reconfigure\": \"" + button_reconfigure()?"ON":"OFF" + "\"}");
+    server.send(200, "application/json", "{ \"button_reconfigure\": \"" + String(button_reconfigure()?"ON":"OFF") + "\"}");
   });
   #endif
 }

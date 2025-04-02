@@ -32,7 +32,7 @@ void check_relay() {
   #ifdef RELAY_POWER_PIN
     if(relay_power_timeout > 0 && relay_power_timeout > millis()) {
       relay_power_timeout = 0;
-      digitalWrite(#ifdef RELAY_POWER_PIN, RELAY_LEVEL_OFF);
+      digitalWrite(RELAY_POWER_PIN, RELAY_POWER_LEVEL_ON);
     }
   #endif
 }
@@ -48,17 +48,17 @@ void relay_set(int relay_port, String cmd) {
   if(value >= 0) {
     switch(value) {
       case RELAY_OFF:
-        digitalWrite(relay_port, RELAY_LEVEL_OFF);
+        digitalWrite(relay_port, RELAY_POWER_LEVEL_OFF);
         break;
       case RELAY_ON:
-        digitalWrite(relay_port, RELAY_LEVEL_ON);
+        digitalWrite(relay_port, RELAY_POWER_LEVEL_ON);
         break;
       case RELAY_POWER_OFF:
-        digitalWrite(relay_port, RELAY_LEVEL_ON);
+        digitalWrite(relay_port, RELAY_POWER_LEVEL_ON);
         relay_power_timeout = millis() + TIMEOUT_RELAY_OFF;
         break;
       case RELAY_POWER_ON:
-        digitalWrite(relay_port, RELAY_LEVEL_ON);
+        digitalWrite(relay_port, RELAY_POWER_LEVEL_ON);
         relay_power_timeout = millis() + TIMEOUT_RELAY_ON;
         break;
     }
