@@ -3,8 +3,13 @@
 // array [ POWER, SYS#1, SYS#2, SYS#3, SYS#4 ]
 
 #ifdef RELAY_POWER_PIN
-// relay power precisa de timeout para saber quando desligar nos pulson ON/OFF
-long relay_power_timeout = 0;
+  // relay power precisa de timeout para saber quando desligar nos pulson ON/OFF
+  long relay_power_timeout = 0;
+#endif
+
+#ifdef RELAY_POWER_PIN
+  // relay reset precisa de timeout para saber quando desligar depois do reset
+  long relay_reset_timeout = 0;
 #endif
 
 void relay_init() {
@@ -41,23 +46,39 @@ void relay_check() {
   #ifdef RELAY_POWER_PIN
     if(relay_power_timeout > 0 && relay_power_timeout > millis()) {
       relay_power_timeout = 0;
-      digitalWrite(RELAY_POWER_PIN, RELAY_POWER_LEVEL_ON);
+      digitalWrite(RELAY_POWER_PIN, (RELAY_POWER_LEVEL_ON==HIGH)?LOW:HIGH);
+    }
+  #endif
+  #ifdef RELAY_RESET_PIN
+    if(relay_reset_timeout > 0 && relay_reset_timeout > millis()) {
+      relay_reset_timeout = 0;
+      digitalWrite(RELAY_RESET_PIN, (RELAY_RESET_LEVEL_ON==HIGH)?LOW:HIGH);
     }
   #endif
 }
 
-void relay_set(int relay_port, String cmd) {
-  int value = -1;
-  int level_on;
-  int level_off;
-  if(cmd == "OFF") value = RELAY_OFF;
-  if(cmd == "ON") value = RELAY_ON;
+int cmdString2Int(String cmd) {
+  if(cmd == "OFF") return(RELAY_OFF);
+  if(cmd == "ON") return(RELAY_ON);
   #ifdef RELAY_POWER_PIN
     if(relay_port == RELAY_POWER_PIN) {
-      if(cmd == "POWER_OFF") value = RELAY_POWER_OFF;
-      if(cmd == "POWER_ON") value = RELAY_POWER_ON;
+      if(cmd == "POWER_OFF") return(RELAY_POWER_OFF);
+      if(cmd == "POWER_ON") return(RELAY_POWER_ON);
     }
   #endif
+  #ifdef RELAY_RESET_PIN
+    if(relay_port == RELAY_RESET_PIN) {
+      if(cmd == "RESET") return(RELAY_RESET);
+    }
+  #endif
+  return(ERROR_VALUE);
+}
+
+void relay_set(int relay_port, String cmd) {
+  int value = cmd2String(cmd)
+  int level_on;
+  int level_off;
+
   switch(relay_port) {
     #ifdef RELAY_POWER_PIN
       case RELAY_POWER_PIN:
@@ -99,12 +120,18 @@ void relay_set(int relay_port, String cmd) {
         break;
       #ifdef RELAY_POWER_PIN
         case RELAY_POWER_OFF:
-          digitalWrite(relay_port, level_on);
+          digitalWrite(RELAY_POWER_PIN, level_on);
           relay_power_timeout = millis() + TIMEOUT_RELAY_OFF;
           break;
         case RELAY_POWER_ON:
-          digitalWrite(relay_port, level_on);
+          digitalWrite(RELAY_POWER_PIN, level_on);
           relay_power_timeout = millis() + TIMEOUT_RELAY_ON;
+          break;
+      #endif
+      #ifdef RELAY_RESET_PIN
+        case RELAY_RESET:
+          digitalWrite(RELAY_RESET_PIN, level_on);
+          relay_reset_timeout = millis() + TIMEOUT_RESET;
           break;
       #endif
     }

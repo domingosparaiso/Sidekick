@@ -4,10 +4,10 @@
 void button_init() {
   #ifdef BUTTON_POWER_PIN
     resourcesAddItem("power");
+    Serial.print("Button power PIN: ");
+    Serial.println(BUTTON_POWER_PIN);
     #if VALUE_BUTTON_POWER == HIGH
       pinMode(BUTTON_POWER_PIN, INPUT_PULLUP);
-      Serial.print("Button power: ");
-      Serial.println(BUTTON_POWER_PIN);
     #endif
     #if VALUE_BUTTON_POWER == LOW
       pinMode(BUTTON_POWER_PIN, INPUT_PULLDOWN);
@@ -19,6 +19,8 @@ void button_init() {
   #endif
   #ifdef BUTTON_RESET_PIN
     resourcesAddItem("reset");
+    Serial.print("Button reset PIN: ");
+    Serial.println(BUTTON_POWER_PIN);
     #if VALUE_BUTTON_RESET == HIGH
       pinMode(BUTTON_RESET_PIN, INPUT_PULLUP);
     #endif
@@ -32,6 +34,8 @@ void button_init() {
   #endif
   #ifdef BUTTON_RECONFIGURE_PIN
     resourcesAddItem("reconfigure");
+    Serial.print("Button reconfigure PIN: ");
+    Serial.println(BUTTON_POWER_PIN);
     #if VALUE_BUTTON_RECONFIGURE == HIGH
       pinMode(BUTTON_RECONFIGURE_PIN, INPUT_PULLUP);
     #endif
@@ -85,8 +89,8 @@ void button_register() {
 
 void button_check() {
   #ifdef BUTTON_POWER_PIN
-    if(button_power()) {
-      #ifdef RELAY_POWER_PIN
+    #ifdef RELAY_POWER_PIN
+      if(button_power()) {
         #ifdef LED_POWER_PIN
           if(led_power()) {
             relay_set(RELAY_POWER_PIN, String("POWER_OFF"));
@@ -96,7 +100,18 @@ void button_check() {
         #else
           relay_set(RELAY_POWER_PIN, String("POWER_ON"));
         #endif
-      #endif
+      }
+    #endif
+  #endif
+  #ifdef BUTTON_RESET_PIN
+    #ifdef RELAY_RESET_PIN
+    if(button_reset()) {
+      relay_set(RELAY_RESET_PIN, String("RESET"));
     }
+    #else
+      #ifdef RELAY_POWER_PIN
+
+      #endif
+    #endif
   #endif
 }

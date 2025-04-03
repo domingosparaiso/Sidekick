@@ -53,6 +53,8 @@
   #define TIMEOUT_RELAY_ON 500
   // Tempo em ms que o relay fica fechado para desligar o computador (só usado com o power)
   #define TIMEOUT_RELAY_OFF 5000
+  //  Tempo em ms para o relay ficar acionado no pino de reset
+  #define TIMEOUT_RESET 100
   // -------------------------------------------------------------------------------
 
   // --- rpm -----------------------------------------------------------------------

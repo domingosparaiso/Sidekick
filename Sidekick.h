@@ -48,5 +48,7 @@
   #define RELAY_ON 1
   #define RELAY_POWER_OFF 2
   #define RELAY_POWER_ON 3
+  #define RELAY_RESET 4
+  #define ERROR_VALUE -1
 
 #endif // <EOF>
