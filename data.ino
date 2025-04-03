@@ -36,3 +36,17 @@ String getFile(String filename) {
   storage.close();
   return(contents);
 }
+
+void resourcesAddValue(String item_name, String item_value) {
+  resourcesJson += ",\"" + item_name + "\":\"" + item_value + "\"";
+}
+
+void resourcesAddItem(String item_value) {
+  if(resourcesList != "") resourcesList += ",";
+  resourcesList += "\"" + item_value + "\"";
+}
+
+void resourcesAddArray(String array_name) {
+  resourcesJson += ",\"" + array_name + "\":[" + resourcesList + "]";
+  resourcesList = "";
+}

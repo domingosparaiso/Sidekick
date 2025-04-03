@@ -98,11 +98,14 @@ String charToStr(uint8_t opt) {
 }
 
 void configServerInit() {
+
+  Serial.println("init..1");
   // Página para upload que inicializa da atualização
   server.on("/upload", HTTP_GET, []() {
     server.send(200, "text/html", uploadHtml);
   });
 
+  Serial.println("init..2");
   // Reiniciar o dispositivo sem alterações
   server.on("/reboot", HTTP_GET, []() {
     server.send(200, "text/html", "<html><body><h1>Reboot in progress...</h1></body></html>");
@@ -110,14 +113,26 @@ void configServerInit() {
     ESP.restart();
   });
 
+  Serial.println("init..3");
   server.on("/config", HTTP_POST, reconfigure);
 
+  Serial.println("init..4");
   button_register();
+  Serial.println("init..5");
   led_register();
+  Serial.println("init..6");
   relay_register();
+  Serial.println("init..7");
   rpm_register();
+  Serial.println("init..8");
   temperature_register();
+
+  Serial.println("init..9");
+  server.on("/resources.json", []() {
+    server.send(200, "application/json", resourcesJson);
+  });
  
+  Serial.println("init..10");
   server.on("/config.json", []() {
     String DHCPcfg = (CFG.data.CLI.DHCP)?String("dhcp"):String("fixo");
     String result =   "{ \"serverName\": \"" +       String(CFG.data.serverName) +         "\"," +
@@ -148,6 +163,7 @@ void configServerInit() {
     server.send(200, "application/json", result);
   });
 
+  Serial.println("init..11");
   // Realiza a atualização do firmware
   server.on(
     "/update", HTTP_POST,
@@ -160,6 +176,7 @@ void configServerInit() {
     }
   );
 
+  Serial.println("init..12");
   // apagar arquivos do SPIFFS
   server.on("/delete", []() {
     for (uint8_t i = 0; i < server.args(); i++) {
@@ -176,6 +193,7 @@ void configServerInit() {
     server.send(200, "text/plain", "");
   });
 
+  Serial.println("init..13");
   // formatar o SPIFFS
   server.on("/format", []() {
     display_status(STATUS_FORMAT_FS);
@@ -188,6 +206,7 @@ void configServerInit() {
     }
   });
 
+  Serial.println("init..14");
   // gerenciamento de arquivos
   server.on("/fs", []() {
     String fsIndex = String(fileHtml);
@@ -204,6 +223,7 @@ void configServerInit() {
     server.send(200, "text/html", fsIndex + result);
   });
 
+  Serial.println("init..15");
   // upload de arquivos
   server.on("/fs-upload", HTTP_POST, []() {
       server.sendHeader("Connection", "close");
@@ -211,9 +231,11 @@ void configServerInit() {
     }
     , handleFileUpload);
 
+  Serial.println("init..16");
   // arquivos salvos no SPIFFS
   server.serveStatic("/", SPIFFS, "/");
 
+  Serial.println("init..17");
   // url não encontrada, abre o setup.html, se não existir, mostra um link para gerenciador de arquivos
   server.onNotFound([]() {
     String indexHtmlFS = "<html><body><h1>Arquivo 'setup.html' n&atilde;o encontrado.</h1><hr><a href=/fs>Arquivos</a></body></html>";
@@ -227,11 +249,14 @@ void configServerInit() {
     server.send(200, "text/html", indexHtmlFS);
   });
 
+  Serial.println("init..18");
   // enable CORS header in webserver results
   server.enableCORS(true);
 
+  Serial.println("init..19");
   // inicia o servidor web
   server.begin();
+  Serial.println("init.. [OK]");
 }
 
 void send_result_json(String result) {
@@ -239,12 +264,13 @@ void send_result_json(String result) {
 }
 
 void server_setup() {
-  Serial.print("Setup do servidor...");
+  Serial.println("Setup do servidor");
   configServerInit();
-  Serial.println(" [OK]");
+  Serial.println("Setup do servidor... [OK]");
 }
 
 void server_loop() {
   server.handleClient();
-  check_relay();
+  button_check();
+  relay_check();
 }

@@ -3,14 +3,16 @@
 
 void led_init() {
   #ifdef LED_POWER_PIN
+    resourcesAddItem(String("power"));
     pinMode(LED_POWER_PIN, INPUT);
     digitalWrite(LED_POWER_PIN, LOW);
   #endif
   #ifdef LED_HDD_PIN
+  resourcesAddItem(String("hdd"));
     pinMode(LED_HDD_PIN, INPUT);
     digitalWrite(LED_HDD_PIN, LOW);
   #endif
-
+  resourcesAddArray(String("leds"));
 }
 
 #ifdef LED_POWER_PIN

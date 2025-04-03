@@ -29,30 +29,36 @@ void IRAM_ATTR handle_RPM_SYS4() { FAN_SYS4.counter++; }
 void rpm_init() {
   tickerSecond.attach(1, updateRPMs);
   #ifdef RPM_CPU_PIN
+    resourcesAddItem(String("cpu"));
     pinMode(RPM_CPU_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(RPM_CPU_PIN), handle_RPM_CPU, CHANGE);
     FAN_CPU.millis = millis();
   #endif
   #ifdef RPM_SYS1_PIN
+    resourcesAddItem(String("sys1"));
     pinMode(RPM_SYS1_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(RPM_SYS1_PIN), handle_RPM_SYS1, CHANGE);
     FAN_SYS1.millis = millis();
   #endif
   #ifdef RPM_SYS2_PIN
+    resourcesAddItem(String("sys2"));
     pinMode(RPM_SYS2_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(RPM_SYS2_PIN), handle_RPM_SYS2, CHANGE);
     FAN_SYS2.millis = millis();
   #endif
   #ifdef RPM_SYS3_PIN
+    resourcesAddItem(String("sys3"));
     pinMode(RPM_SYS3_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(RPM_SYS3_PIN), handle_RPM_SYS3, CHANGE);
     FAN_SYS3.millis = millis();
   #endif
   #ifdef RPM_SYS4_PIN
+    resourcesAddItem(String("sys4"));
     pinMode(RPM_SYS4_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(RPM_SYS4_PIN), handle_RPM_SYS4, CHANGE);
     FAN_SYS4.millis = millis();
   #endif
+  resourcesAddArray(String("rpm"));
 }
 
 void update_rpm(volatile rpm_data& FAN, long millis_count){

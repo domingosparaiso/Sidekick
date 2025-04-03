@@ -9,26 +9,33 @@ long relay_power_timeout = 0;
 
 void relay_init() {
   #ifdef RELAY_POWER_PIN
+    resourcesAddItem(String("power"));
     pinMode(RELAY_POWER_PIN, OUTPUT);
   #endif
   #ifdef RELAY_RESET_PIN
+    resourcesAddItem(String("reset"));
     pinMode(RELAY_RESET_PIN, OUTPUT);
   #endif
   #ifdef RELAY_SYS1_PIN
+    resourcesAddItem(String("sys1"));
     pinMode(RELAY_SYS1_PIN, OUTPUT);
   #endif
   #ifdef RELAY_SYS2_PIN
+    resourcesAddItem(String("sys2"));
     pinMode(RELAY_SYS2_PIN, OUTPUT);
   #endif
   #ifdef RELAY_SYS3_PIN
+    resourcesAddItem(String("sys3"));
     pinMode(RELAY_SYS3_PIN, OUTPUT);
   #endif
   #ifdef RELAY_SYS4_PIN
+    resourcesAddItem(String("sys4"));
     pinMode(RELAY_SYS4_PIN, OUTPUT);
   #endif
+  resourcesAddArray(String("relay"));
 }
 
-void check_relay() {
+void relay_check() {
   #ifdef RELAY_POWER_PIN
     if(relay_power_timeout > 0 && relay_power_timeout > millis()) {
       relay_power_timeout = 0;

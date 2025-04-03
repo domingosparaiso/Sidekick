@@ -6,21 +6,19 @@
 #include <uri/UriBraces.h>
 #include "FS.h"
 #include "SPIFFS.h"
+#include "display.h"
 #include "config.h"
 #include "Sidekick.h"
 #include "data.h"
 #include "wifi.h"
-#define LED_PIN 2
 
 WebServer server(80);
 int SIZE_config_data;
 union config_union CFG;
 String serialNumber = "";
+String resourcesJson = "";
+String resourcesList = "";
 int wifi_method = CLIENT_WIFI;
-
-void changeLED() {
-  digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-}
 
 void setup() {
   delay(2000);
@@ -33,7 +31,7 @@ void setup() {
 	Serial.print(F("CPU Frequency = "));
 	Serial.print(F_CPU / 1000000);
 	Serial.println(F(" MHz"));
-  pinMode(LED_PIN, OUTPUT);
+  resourcesJson = String("{\"board\": \"") + String(ARDUINO_BOARD) + String("\", \"mhz\":\"") + String(F_CPU / 1000000) + String("\", \"display\":\"") + String(DISPLAY_NAME) + String("\"");
   long unsigned int espmac = ESP.getEfuseMac() >> 24;
   serialNumber = String(espmac, HEX);
   serialNumber.toUpperCase();
@@ -45,13 +43,14 @@ void setup() {
   load_CFG(); // data.ino
   delay(1000);
   Serial.println(F("Load configuration... [OK]"));
-  check_wifi(); // wifi.ino
-  server_setup(); // server.ino
   button_init();
   led_init();
   relay_init();
   rpm_init();
   temperature_init();
+  resourcesJson += "}";
+  check_wifi(); // wifi.ino
+  server_setup(); // server.ino
   Serial.println(F("System ready!\n"));
 }
 
@@ -149,6 +148,7 @@ void wifi_connect(int connection_type) {
 void check_wifi() {
   if(wifi_method == CLIENT_WIFI) {
     if(WiFi.status() != WL_CONNECTED) {
+      Serial.println("Tentando conexao wifi...");
       int retry_connect = 3;
       while(WiFi.status() != WL_CONNECTED && retry_connect-- > 0) {
         wifi_connect(CLIENT_WIFI);
