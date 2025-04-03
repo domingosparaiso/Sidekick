@@ -46,28 +46,65 @@ void relay_check() {
 
 void relay_set(int relay_port, String cmd) {
   int value = -1;
+  int level_on;
+  int level_off;
   if(cmd == "OFF") value = RELAY_OFF;
   if(cmd == "ON") value = RELAY_ON;
-  if(relay_port == RELAY_POWER_PIN) {
-    if(cmd == "POWER_OFF") value = RELAY_POWER_OFF;
-    if(cmd == "POWER_ON") value = RELAY_POWER_ON;
+  #ifdef RELAY_POWER_PIN
+    if(relay_port == RELAY_POWER_PIN) {
+      if(cmd == "POWER_OFF") value = RELAY_POWER_OFF;
+      if(cmd == "POWER_ON") value = RELAY_POWER_ON;
+    }
+  #endif
+  switch(relay_port) {
+    #ifdef RELAY_POWER_PIN
+      case RELAY_POWER_PIN:
+        level_on = RELAY_POWER_LEVEL_ON;
+        break;
+    #endif
+    #ifdef RELAY_SYS1_PIN
+      case RELAY_SYS1_PIN:
+        level_on = RELAY_SYS1_LEVEL_ON;
+        break;
+    #endif
+    #ifdef RELAY_SYS2_PIN
+      case RELAY_SYS2_PIN:
+        level_on = RELAY_SYS2_LEVEL_ON;
+        break;
+    #endif
+    #ifdef RELAY_SYS3_PIN
+      case RELAY_SYS3_PIN:
+        level_on = RELAY_SYS3_LEVEL_ON;
+        break;
+    #endif
+    #ifdef RELAY_SYS4_PIN
+      case RELAY_SYS4_PIN:
+        level_on = RELAY_SYS4_LEVEL_ON;
+        break;
+    #endif
+    default:
+      level_on = HIGH;
+      break;
   }
+  level_off = (level_on == HIGH)?LOW:HIGH;
   if(value >= 0) {
     switch(value) {
       case RELAY_OFF:
-        digitalWrite(relay_port, RELAY_POWER_LEVEL_OFF);
+        digitalWrite(relay_port, level_off);
         break;
       case RELAY_ON:
-        digitalWrite(relay_port, RELAY_POWER_LEVEL_ON);
+        digitalWrite(relay_port, level_on);
         break;
-      case RELAY_POWER_OFF:
-        digitalWrite(relay_port, RELAY_POWER_LEVEL_ON);
-        relay_power_timeout = millis() + TIMEOUT_RELAY_OFF;
-        break;
-      case RELAY_POWER_ON:
-        digitalWrite(relay_port, RELAY_POWER_LEVEL_ON);
-        relay_power_timeout = millis() + TIMEOUT_RELAY_ON;
-        break;
+      #ifdef RELAY_POWER_PIN
+        case RELAY_POWER_OFF:
+          digitalWrite(relay_port, level_on);
+          relay_power_timeout = millis() + TIMEOUT_RELAY_OFF;
+          break;
+        case RELAY_POWER_ON:
+          digitalWrite(relay_port, level_on);
+          relay_power_timeout = millis() + TIMEOUT_RELAY_ON;
+          break;
+      #endif
     }
     send_result_json("OK");
   } else {

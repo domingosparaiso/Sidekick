@@ -2,11 +2,11 @@
   #define CONFIG_H 1
   // --- button.c ------------------------------------------------------------------
   // * Configuração da leitura dos botões do gabinete
-  #define BUTTON_POWER_PIN 1
+  //#define BUTTON_POWER_PIN 18
   //#define BUTTON_RESET_PIN 2
   //#define BUTTON_RECONFIGURE_PIN 3
   // * Valor lido quando o botão for pressionado (LOW=PULLUP, hIGH=PULLDOWN)
-  #define VALUE_BUTTON_POWER HIGH
+  //#define VALUE_BUTTON_POWER HIGH
   //#define VALUE_BUTTON_RESET HIGH
   //#define VALUE_BUTTON_RECONFIGURE HIGH
   // -------------------------------------------------------------------------------
@@ -33,8 +33,8 @@
 
   // --- relay ---------------------------------------------------------------------
   // Relay power conectado à placa mãe nos pinos do botão power
-  #define RELAY_POWER_PIN 2
-  #define RELAY_POWER_LEVEL_ON LOW
+  //#define RELAY_POWER_PIN 2
+  //#define RELAY_POWER_LEVEL_ON LOW
   // Relay reset  conectado à placa mãe nos pinos do botão reset
   //#define RELAY_RESET_PIN 9
   //#define RELAY_RESET_LEVEL_ON LOW

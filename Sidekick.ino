@@ -42,21 +42,40 @@ void setup() {
   Serial.println(F("Init flash device... [OK]"));
   load_CFG(); // data.ino
   delay(1000);
-  Serial.println(F("Load configuration... [OK]"));
+  Serial.println("Load configuration... [OK]");
   button_init();
   led_init();
   relay_init();
   rpm_init();
   temperature_init();
   resourcesJson += "}";
-  check_wifi(); // wifi.ino
+  ///////////////////////////////////////// check_wifi(); // wifi.ino
+  connect_wifi();
   server_setup(); // server.ino
   Serial.println(F("System ready!\n"));
 }
 
 void loop() {
-  check_wifi(); // wifi.ino
+//  check_wifi(); // wifi.ino
   server_loop(); // server.ino
+}
+
+void connect_wifi() {
+  WiFi.begin("SOTELE#2Ghz", "mamusKa#76");
+  Serial.println(F("Conectando rede wifi "));
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(500);
+  }
+  IPAddress ip(192,168,1,88);
+  IPAddress gateway(192,168,1,10);
+  IPAddress subnet(255,255,255,0);
+  IPAddress dns(192,168,1,10);
+  WiFi.config(ip, dns, gateway, subnet);
+  Serial.println("");
+  Serial.print(F("Conectado: "));
+  Serial.print(WiFi.localIP());
+  Serial.println(F("... [OK]"));
 }
 
 void wifi_connect(int connection_type) {
