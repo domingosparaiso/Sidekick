@@ -11,6 +11,7 @@
 #include "Sidekick.h"
 #include "data.h"
 #include "wifi.h"
+#define LED_PIN 2
 
 WebServer server(80);
 int SIZE_config_data;
@@ -20,11 +21,18 @@ String resourcesJson = "";
 String resourcesList = "";
 int wifi_method = CLIENT_WIFI;
 
+void activity() {
+  digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+}
+
 void setup() {
   delay(2000);
   Serial.begin(115200);
+  pinMode(LED_PIN, OUTPUT);
+  activity();
 	while (!Serial && millis() < 5000);
   delay(500);
+  activity();
   Serial.println(F("\nPower ON"));
 	Serial.print(F("\Board "));
 	Serial.println(ARDUINO_BOARD);
@@ -39,15 +47,22 @@ void setup() {
   inicializa_flash();  // data.ino (OK)
   display_init();
   delay(1000);
+  activity();
   Serial.println(F("Init flash device... [OK]"));
   load_CFG(); // data.ino
   delay(1000);
+  activity();
   Serial.println("Load configuration... [OK]");
   button_init();
+  Serial.println("Button init... [OK]");
   led_init();
+  Serial.println("LED init... [OK]");
   relay_init();
+  Serial.println("Relay init... [OK]");
   rpm_init();
+  Serial.println("RPM init... [OK]");
   temperature_init();
+  Serial.println("Temperature init... [OK]");
   resourcesJson += "}";
   ///////////////////////////////////////// check_wifi(); // wifi.ino
   connect_wifi();
@@ -65,6 +80,7 @@ void connect_wifi() {
   Serial.println(F("Conectando rede wifi "));
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
+    activity();
     delay(500);
   }
   IPAddress ip(192,168,1,88);

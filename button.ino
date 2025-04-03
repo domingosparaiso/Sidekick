@@ -6,6 +6,8 @@ void button_init() {
     resourcesAddItem("power");
     #if VALUE_BUTTON_POWER == HIGH
       pinMode(BUTTON_POWER_PIN, INPUT_PULLUP);
+      Serial.print("Button power: ");
+      Serial.println(BUTTON_POWER_PIN);
     #endif
     #if VALUE_BUTTON_POWER == LOW
       pinMode(BUTTON_POWER_PIN, INPUT_PULLDOWN);

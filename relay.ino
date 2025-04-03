@@ -11,6 +11,8 @@ void relay_init() {
   #ifdef RELAY_POWER_PIN
     resourcesAddItem(String("power"));
     pinMode(RELAY_POWER_PIN, OUTPUT);
+    Serial.print("Relay power: ");
+    Serial.println(RELAY_POWER_PIN);
   #endif
   #ifdef RELAY_RESET_PIN
     resourcesAddItem(String("reset"));

@@ -253,4 +253,5 @@ void server_loop() {
   server.handleClient();
   button_check();
   relay_check();
+  delay(200);
 }
