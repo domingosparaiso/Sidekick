@@ -30,13 +30,15 @@
 <form method='POST' action='/config' target='formnull' onsubmit='getports();'>
 
 <div class=janela id='menu-controle'>
-	<h3 id='information'></h3>
-	<div id='control'></div>
 </div>
 
 <div class=janela id='menu-config'>
 	<div class=titulo>Configura&ccedil;&atilde;o</div>
 	<div class=menu>
+		<div class=item-menu-auxiliar onclick="show('tab-hardware','');">
+			Hardware
+		</div>
+		<div class=separador></div>
 		<div class=item-menu-auxiliar onclick="show('tab-server','');">
 			Servidor
 		</div>
@@ -48,10 +50,6 @@
 			<div class=item-menu-auxiliar onclick="show('tab-wifi-ap','');">
 				Access Point
 			</div>
-		</div>
-		<div class=separador></div>
-		<div class=item-menu-auxiliar onclick="show('tab-hardware','');">
-			Hardware
 		</div>
 		<div class=separador></div>
 		<div class=item-menu-auxiliar>
@@ -117,10 +115,7 @@
 </div>
 
 <div class=janela id='tab-hardware'>
-<div class=titulo>Hardware - Mapeamento das portas de I/O</div>
-<input name='ports' id='ports' type='hidden'>
-<input name='types' id='types' type='hidden'>
-<input name='connections' id='connections' type='hidden'>
+<div class=titulo>Hardware - Configura&ccedil;&otilde;es fixas</div>
 <div id='hardware-table'>
 </div>
 </div>

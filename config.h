@@ -6,7 +6,7 @@
   //#define BUTTON_RESET_PIN 2
   //#define BUTTON_RECONFIGURE_PIN 3
   // * Valor lido quando o botão for pressionado (LOW=PULLUP, hIGH=PULLDOWN)
-  #define VALUE_BUTTON_POWER HIGH
+  #define VALUE_BUTTON_POWER LOW
   //#define VALUE_BUTTON_RESET HIGH
   //#define VALUE_BUTTON_RECONFIGURE HIGH
   // -------------------------------------------------------------------------------
@@ -50,11 +50,13 @@
   //#define RELAY_SYS4_LEVEL_ON LOW
 
   // Tempo em ms que o relay fica fechado para ligar o computador (só usado com o power)
-  #define TIMEOUT_RELAY_ON 500
+  #define TIMEOUT_RELAY_ON 2000
   // Tempo em ms que o relay fica fechado para desligar o computador (só usado com o power)
-  #define TIMEOUT_RELAY_OFF 5000
+  #define TIMEOUT_RELAY_OFF 6000
+  // Tempo em ms que o relay fica desligado antes de religar a máquina (usado quando tem botão reset mas não tem relay reset)
+  #define TIMEOUT_RESET_INTERVAL 1000
   //  Tempo em ms para o relay ficar acionado no pino de reset
-  #define TIMEOUT_RESET 100
+  #define TIMEOUT_RESET 1000
   // -------------------------------------------------------------------------------
 
   // --- rpm -----------------------------------------------------------------------

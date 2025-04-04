@@ -12,7 +12,7 @@ void led_init() {
     pinMode(LED_HDD_PIN, INPUT);
     digitalWrite(LED_HDD_PIN, LOW);
   #endif
-  resourcesAddArray(String("leds"));
+  resourcesAddArray(String("led"));
 }
 
 #ifdef LED_POWER_PIN

@@ -1,4 +1,5 @@
 updatehw = 0;
+updatepg = 0;
 
 function show_hide_main_menu(){
 	topmenu = document.getElementById('top-menu');
@@ -62,8 +63,59 @@ function update_fields(data) {
 			document.getElementById(key).value = value;
 		}
 	}
-	document.getElementById('information').innerHTML = 'Serial: ' + data.serialNumber +
-													'&nbsp;Vers&atilde;o: ' + data.version;
+}
+
+function button_action(button_name) {
+	console.log('Button: ' + button_name);
+	fetch('/button/' + button_name);
+}
+
+function make_buttons(data) {
+	var result = "";
+	for(i = 0; i < data.length; i++) {
+		value = data[i];
+		result += "<div class='control-button' onclick=button_action('" + value + "')>" + value + "</div>";
+	}
+	return(result);
+}
+
+function make_list(data) {
+	var result = "";
+	var sep = "";
+	for(i = 0; i < data.length; i++) {
+		value = data[i];
+		result += sep + value;
+		sep = ", ";
+	}
+	if(data.length==0) result = "-";
+	return(result);
+}
+
+function update_resources(data) {
+	buttons = make_list(data.button);
+	leds = make_list(data.led);
+	relays = make_list(data.relay);
+	rpms = make_list(data.rpm);
+	temperature = make_list(data.temperature);
+	Htable = "<table>" +
+		"<tr><td>Serial</td><td>" + data.serialNumber + "</td></tr>" +
+		"<tr><td>Vers&atilde;o</td><td>" + data.version + "</td></tr>" +
+		"<tr><td>Placa</td><td>" + data.board + "</td></tr>" +
+		"<tr><td>Frequ&ecirc;ncia</td><td>" + data.mhz + " Mhz</td></tr>" +
+		"<tr><td>Display</td><td>" + data.display + "</td></tr>" +
+		"<tr><td>Bot&otilde;es</td><td>" + buttons + "</td></tr>" +
+		"<tr><td>Leds</td><td>" + leds + "</td></tr>" +
+		"<tr><td>Rel&eacute;s</td><td>" + relays + "</td></tr>" +
+		"<tr><td>Coolers</td><td>" + rpms + "</td></tr>" +
+		"<tr><td>Temperatura</td><td>" + temperature + "</td></tr>" +
+		"</table>";
+	document.getElementById('hardware-table').innerHTML = Htable;
+	document.getElementById('menu-controle').innerHTML = make_buttons(data.button);
+}
+
+function update_page() {
+	updatepg++;
+	if(updatepg == 2) show('menu-controle','main');
 }
 
 window.onload = function() {
@@ -71,7 +123,13 @@ window.onload = function() {
 		.then(res => res.json())
 		.then((out) => {
 			update_fields(out);
-			show('menu-controle','main');
+			update_page();
+	}).catch(err => console.error(err));
+	fetch('/resources.json')
+		.then(res => res.json())
+		.then((out) => {
+			update_resources(out);
+			update_page();
 	}).catch(err => console.error(err));
 };
 

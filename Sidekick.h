@@ -44,11 +44,12 @@
     #define DISPLAY_NAME DISPLAY_NAME_LCD1602
   #endif
 
+  #define ERROR_VALUE -1
   #define RELAY_OFF 0
   #define RELAY_ON 1
   #define RELAY_POWER_OFF 2
   #define RELAY_POWER_ON 3
   #define RELAY_RESET 4
-  #define ERROR_VALUE -1
+  #define RELAY_POWER_OFF_ON 5
 
 #endif // <EOF>

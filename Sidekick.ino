@@ -26,6 +26,9 @@ void activity() {
 }
 
 void setup() {
+  long unsigned int espmac = ESP.getEfuseMac() >> 24;
+  serialNumber = String(espmac, HEX);
+  serialNumber.toUpperCase();
   delay(2000);
   Serial.begin(115200);
   pinMode(LED_PIN, OUTPUT);
@@ -39,10 +42,12 @@ void setup() {
 	Serial.print(F("CPU Frequency = "));
 	Serial.print(F_CPU / 1000000);
 	Serial.println(F(" MHz"));
-  resourcesJson = String("{\"board\": \"") + String(ARDUINO_BOARD) + String("\", \"mhz\":\"") + String(F_CPU / 1000000) + String("\", \"display\":\"") + String(DISPLAY_NAME) + String("\"");
-  long unsigned int espmac = ESP.getEfuseMac() >> 24;
-  serialNumber = String(espmac, HEX);
-  serialNumber.toUpperCase();
+  resourcesJson = String("{\"board\": \"") + String(ARDUINO_BOARD) + 
+                  String("\", \"mhz\":\"") + String(F_CPU / 1000000) +
+                  String("\", \"display\":\"") + String(DISPLAY_NAME) + String("\",") +
+                  String("\"version\": \"") + String(VERSAO) + String("\",") +
+                  String("\"serialNumber\": \"") + String(serialNumber) + "\"";
+ 
   Serial.println(String(F("Device Serial: ")) + serialNumber);
   inicializa_flash();  // data.ino (OK)
   display_init();
@@ -102,6 +107,7 @@ void wifi_connect(int connection_type) {
       CFG.data.CLI.IP[0]=192;CFG.data.CLI.IP[1]=168;CFG.data.CLI.IP[2]=1;CFG.data.CLI.IP[3]=88;
       CFG.data.CLI.GW[0]=192;CFG.data.CLI.GW[1]=168;CFG.data.CLI.GW[2]=1;CFG.data.CLI.GW[3]=10;
       CFG.data.CLI.MASK[0]=255;CFG.data.CLI.MASK[1]=255;CFG.data.CLI.MASK[2]=255;CFG.data.CLI.MASK[3]=0;
+      CFG.data.CLI.DNS[0]=192;CFG.data.CLI.DNS[1]=168;CFG.data.CLI.DNS[2]=1;CFG.data.CLI.DNS[3]=10;
     }
     WiFi.begin(CFG.data.CLI.wifi.SSID, CFG.data.CLI.wifi.password);
     Serial.print(F("SSID: "));

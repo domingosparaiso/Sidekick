@@ -3,6 +3,7 @@
 
 uint8_t otaDone = 0;
 File uploadFile;
+long timeout_reboot = 0;
 
 void handleUpdateEnd() {
   server.sendHeader("Connection", "close");
@@ -108,7 +109,8 @@ void configServerInit() {
   server.on("/reboot", HTTP_GET, []() {
     server.send(200, "text/html", "<html><body><h1>Reboot in progress...</h1></body></html>");
     display_status(STATUS_REBOOT);
-    ESP.restart();
+    Serial.println("Reboot do servidor");
+    timeout_reboot = millis() + 5000;
   });
 
   server.on("/config", HTTP_POST, reconfigure);
@@ -120,10 +122,12 @@ void configServerInit() {
   temperature_register();
 
   server.on("/resources.json", []() {
+    Serial.println("GET> resources.json");
     server.send(200, "application/json", resourcesJson);
   });
  
   server.on("/config.json", []() {
+    Serial.println("GET> config.json");
     String DHCPcfg = (CFG.data.CLI.DHCP)?String("dhcp"):String("fixo");
     String result =   "{ \"serverName\": \"" +       String(CFG.data.serverName) +         "\"," +
                         "\"CLI_wifi_SSID\":\"" +     String(CFG.data.CLI.wifi.SSID) +     "\"," +
@@ -147,9 +151,7 @@ void configServerInit() {
                                        "\"" +        String(CFG.data.CLI.DNS[3]) +        "\"]," +
                         "\"AP_SSID\": \"" +          String(CFG.data.AP.SSID) +           "\"," +
                         "\"AP_password\": \"" +      String(CFG.data.AP.password) +       "\"," +
-                        "\"password\": \"" +         String(CFG.data.password) +          "\"," +
-                        "\"version\": \"" +          String(VERSAO) +                     "\"," +
-                        "\"serialNumber\": \"" +     serialNumber +                       "\" }";
+                        "\"password\": \"" +         String(CFG.data.password) +          "\"}";
     server.send(200, "application/json", result);
   });
 
@@ -184,6 +186,7 @@ void configServerInit() {
   // formatar o SPIFFS
   server.on("/format", []() {
     display_status(STATUS_FORMAT_FS);
+    Serial.println("<FORMAT>");
     if(SPIFFS.format()) {
       server.send(200, "text/html", "<html><body>Armazenamento Flash formatado.<hr><a href=/home>Home</a></body></html>");
       display_status(STATUS_FORMAT_OK);
@@ -219,11 +222,11 @@ void configServerInit() {
   // arquivos salvos no SPIFFS
   server.serveStatic("/", SPIFFS, "/");
 
-  // url não encontrada, abre o setup.html, se não existir, mostra um link para gerenciador de arquivos
+  // url não encontrada, abre o index.html, se não existir, mostra um link para gerenciador de arquivos
   server.onNotFound([]() {
-    String indexHtmlFS = "<html><body><h1>Arquivo 'setup.html' n&atilde;o encontrado.</h1><hr><a href=/fs>Arquivos</a></body></html>";
-    if(SPIFFS.exists("/setup.html")) {
-      File storage = SPIFFS.open("/setup.html", "r");
+    String indexHtmlFS = "<html><body><h1>Arquivo 'index.html' n&atilde;o encontrado.</h1><hr><a href=/fs>Arquivos</a></body></html>";
+    if(SPIFFS.exists("/index.html")) {
+      File storage = SPIFFS.open("/index.html", "r");
       if(storage) {
         indexHtmlFS = storage.readString();
         storage.close();
@@ -253,5 +256,5 @@ void server_loop() {
   server.handleClient();
   button_check();
   relay_check();
-  delay(200);
+  if(timeout_reboot > 0 && timeout_reboot > millis()) ESP.restart();
 }
