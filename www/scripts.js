@@ -1,5 +1,6 @@
 updatehw = 0;
 updatepg = 0;
+timeoutb = 0;
 
 function show_hide_main_menu(){
 	topmenu = document.getElementById('top-menu');
@@ -36,10 +37,22 @@ function desabilita_addr(desabilitar) {
 }
 
 function reboot() {
-	url = '/reboot';
-	var xhr = new XMLHttpRequest();
-	xhr.open('GET', url, true);
-	xhr.send(null);
+	fetch('/reboot')
+		.then(x => x.text())
+		.then((out) => {
+			document.getElementById('bodydiv').innerHTML = out;
+			timeoutb = 10;
+			setInterval(function () {
+				if(timeoutb >= 0) {
+					msg = '<h1>' + timeoutb + '</h1>';
+					if(timeoutb == 0) location.reload();
+				} else {
+					msg = '<h1>Reloading...</h1>';
+				}
+				document.getElementById('bodydiv').innerHTML = out + msg;
+				timeoutb--;
+			}, 1000);
+	}).catch(err => console.error(err));
 }
 
 function filesystem() {

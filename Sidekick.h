@@ -66,5 +66,6 @@
   #define WIFI_AP 1
   #define TIME_WAIT_WIFI 100
   #define RECONNECT_CLI 3
+  #define TIMEOUT_CHECK_WIFI 60000
 
 #endif // <EOF>

@@ -104,7 +104,7 @@ void configServerInit() {
   server.on("/reboot", HTTP_GET, []() {
     server.send(200, "text/html", "<html><body><h1>Reboot in progress...</h1></body></html>");
     display_status(STATUS_REBOOT);
-    console_log("Rebbot in progress...");
+    console_log("Reboot in progress...");
     timeout_reboot = millis() + WAIT_TIME_TO_REBOOT;
   });
 

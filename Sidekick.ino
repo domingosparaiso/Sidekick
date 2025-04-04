@@ -15,6 +15,7 @@
 WebServer server(80);
 int SIZE_config_data;
 union config_union CFG;
+bool block_loop = false;
 String serialNumber = "";
 String resourcesJson = "";
 String resourcesList = "";
@@ -110,9 +111,11 @@ void setup() {
 }
 
 void loop() {
-  // [server.ino] chain to server loop functions
-  server_loop();
-  // [wifi.ino] check if wifi is on, and try reconnect when lost connection
-  // check_wifi();
+  if(!block_loop) {
+    // [server.ino] chain to server loop functions
+    server_loop();
+    // [wifi.ino] check if wifi is on, and try reconnect when lost connection
+    check_wifi();
+  }
 }
 

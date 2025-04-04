@@ -1,8 +1,10 @@
 #include "Sidekick.h"
 
 int wifi_mode = WIFI_CLI;
+long next_check_wifi = 0;
 
 void connect_wifi() {
+  next_check_wifi = millis() + TIMEOUT_CHECK_WIFI;
   int retry_connect = RECONNECT_CLI;
   while(wifi_mode == WIFI_CLI && --retry_connect >= 0 && !connect_wifi_cli());
   if(WiFi.status() != WL_CONNECTED) connect_wifi_ap();
@@ -40,9 +42,9 @@ bool connect_wifi_cli() {
     IPAddress dns(CFG.data.CLI.DNS[0], CFG.data.CLI.DNS[1], CFG.data.CLI.DNS[2], CFG.data.CLI.DNS[3]);
     WiFi.config(ip, dns, gateway, subnet);
   }
-  console_log("Connected: ");
+  console_log("Connected: [");
   console_log(WiFi.localIP().toString());
-  console_log("... [OK]\n");
+  console_log("]... [OK]\n");
   display_print(1, 1, F("WiFi CLI"));
   display_print(2, 1, WiFi.localIP().toString());
   return(true);
@@ -77,16 +79,21 @@ void connect_wifi_ap() {
   display_print(2, 1, CFG.data.AP.password);
   wifi_mode = WIFI_AP;
 
-  console_log("\nConnected: ");
-  console_log(String(WiFi.localIP()));
-  console_log("... [OK]");
+  console_log("\nConnected: [");
+  console_log(WiFi.localIP().toString());
+  console_log("] [OK]\n");
   display_print(1, 1, F("WiFi AP"));
   display_print(2, 1, WiFi.localIP().toString());
 }
 
 void check_wifi() {
-  if(WiFi.status() != WL_CONNECTED) {
-    console_log("Lost WiFi connection");
-    connect_wifi();
-  } 
+  if(next_check_wifi < millis()) {
+    block_loop = true;
+    if(WiFi.status() != WL_CONNECTED) {
+      console_log("Lost WiFi connection\n");
+      connect_wifi();
+    }
+    next_check_wifi = millis() + TIMEOUT_CHECK_WIFI;
+    block_loop = false;
+  }
 }
