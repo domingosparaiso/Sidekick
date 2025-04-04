@@ -5,7 +5,7 @@
 bool in_relay_check = false;
 
 #ifdef RELAY_POWER_PIN
-  // relay power precisa de timeout para saber quando desligar nos pulson ON/OFF
+  // power relay needs a timeout to turn it OFF again
   long relay_power_timeout = 0;
   #ifdef BUTTON_RESET_PIN
     #ifndef RELAY_RESET_PIN
@@ -16,38 +16,37 @@ bool in_relay_check = false;
 #endif
 
 #ifdef RELAY_RESET_PIN
-  // relay reset precisa de timeout para saber quando desligar depois do reset
+  // reset relay needs a timeout to turn it OFF again
   long relay_reset_timeout = 0;
 #endif
 
 void relay_init() {
+  console_log("Relay init: ");
   #ifdef RELAY_POWER_PIN
-    resourcesAddItem(String("power"));
+    resourcesAddItem("power", RELAY_POWER_PIN);
     pinMode(RELAY_POWER_PIN, OUTPUT);
-    Serial.print("Relay power: ");
-    Serial.println(RELAY_POWER_PIN);
   #endif
   #ifdef RELAY_RESET_PIN
-    resourcesAddItem(String("reset"));
+    resourcesAddItem("reset", RELAY_RESET_PIN);
     pinMode(RELAY_RESET_PIN, OUTPUT);
   #endif
   #ifdef RELAY_SYS1_PIN
-    resourcesAddItem(String("sys1"));
+    resourcesAddItem("sys1", RELAY_SYS1_PIN);
     pinMode(RELAY_SYS1_PIN, OUTPUT);
   #endif
   #ifdef RELAY_SYS2_PIN
-    resourcesAddItem(String("sys2"));
+    resourcesAddItem("sys2", RELAY_SYS2_PIN);
     pinMode(RELAY_SYS2_PIN, OUTPUT);
   #endif
   #ifdef RELAY_SYS3_PIN
-    resourcesAddItem(String("sys3"));
+    resourcesAddItem("sys3", RELAY_SYS3_PIN);
     pinMode(RELAY_SYS3_PIN, OUTPUT);
   #endif
   #ifdef RELAY_SYS4_PIN
-    resourcesAddItem(String("sys4"));
+    resourcesAddItem("sys4", RELAY_SYS4_PIN);
     pinMode(RELAY_SYS4_PIN, OUTPUT);
   #endif
-  resourcesAddArray(String("relay"));
+  resourcesAddArray("relay");
 }
 
 void relay_check() {
@@ -57,7 +56,6 @@ void relay_check() {
     #ifdef RELAY_POWER_PIN
       if(relay_power_timeout > 0 && relay_power_timeout > now) {
         relay_power_timeout = 0;
-        Serial.println("<Relay POWER: End>");
         digitalWrite(RELAY_POWER_PIN, (RELAY_POWER_LEVEL_ON==HIGH)?LOW:HIGH);
       }
       #ifdef BUTTON_RESET_PIN
@@ -70,7 +68,6 @@ void relay_check() {
           }
           if(relay_power_on_timeout > 0 && relay_power_on_timeout > now) {
             relay_power_on_timeout = 0;
-            Serial.println("<Relay POWER: End>");
             digitalWrite(RELAY_POWER_PIN, RELAY_POWER_LEVEL_ON);
             relay_power_timeout = now + TIMEOUT_RELAY_ON;
           }
@@ -153,28 +150,23 @@ void relay_set(int relay_port, int value) {
     level_off = (level_on == HIGH)?LOW:HIGH;
     switch(value) {
       case RELAY_OFF:
-        Serial.println("<Relay OFF>");
         digitalWrite(relay_port, level_off);
         break;
       case RELAY_ON:
-        Serial.println("<Relay ON>");
         digitalWrite(relay_port, level_on);
         break;
       #ifdef RELAY_POWER_PIN
         case RELAY_POWER_OFF:
-          Serial.println("<Relay POWER OFF>");
           digitalWrite(RELAY_POWER_PIN, RELAY_POWER_LEVEL_ON);
           relay_power_timeout = millis() + TIMEOUT_RELAY_OFF;
           break;
         case RELAY_POWER_ON:
-          Serial.println("<Relay POWER ON>");
           digitalWrite(RELAY_POWER_PIN, RELAY_POWER_LEVEL_ON);
           relay_power_timeout = millis() + TIMEOUT_RELAY_ON;
           break;
         #ifdef BUTTON_RESET_PIN
           #ifndef RELAY_RESET_PIN
             case RELAY_POWER_OFF_ON:
-              Serial.println("<Relay POWER OFF/ON>");
               digitalWrite(RELAY_POWER_PIN, RELAY_POWER_LEVEL_ON);
               relay_power_off_timeout = millis() + TIMEOUT_RELAY_OFF;
               break;
@@ -183,7 +175,6 @@ void relay_set(int relay_port, int value) {
       #endif
       #ifdef RELAY_RESET_PIN
         case RELAY_RESET:
-          Serial.println("<Relay RESET>");
           digitalWrite(RELAY_RESET_PIN, RELAY_RESET_LEVEL_ON);
           relay_reset_timeout = millis() + TIMEOUT_RESET;
           break;

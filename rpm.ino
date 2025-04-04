@@ -27,38 +27,39 @@ void IRAM_ATTR handle_RPM_SYS4() { FAN_SYS4.counter++; }
 #endif
 
 void rpm_init() {
-  tickerSecond.attach(1, updateRPMs);
+  console_log("RPM init: ");
+  tickerSecond.attach(1, updateRPMs);  
   #ifdef RPM_CPU_PIN
-    resourcesAddItem(String("cpu"));
+    resourcesAddItem("cpu", RPM_CPU_PIN);
     pinMode(RPM_CPU_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(RPM_CPU_PIN), handle_RPM_CPU, CHANGE);
     FAN_CPU.millis = millis();
   #endif
   #ifdef RPM_SYS1_PIN
-    resourcesAddItem(String("sys1"));
+    resourcesAddItem("sys1", RPM_SYS1_PIN);
     pinMode(RPM_SYS1_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(RPM_SYS1_PIN), handle_RPM_SYS1, CHANGE);
     FAN_SYS1.millis = millis();
   #endif
   #ifdef RPM_SYS2_PIN
-    resourcesAddItem(String("sys2"));
+    resourcesAddItem("sys2", RPM_SYS2_PIN);
     pinMode(RPM_SYS2_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(RPM_SYS2_PIN), handle_RPM_SYS2, CHANGE);
     FAN_SYS2.millis = millis();
   #endif
   #ifdef RPM_SYS3_PIN
-    resourcesAddItem(String("sys3"));
+    resourcesAddItem("sys3", RPM_SYS3_PIN);
     pinMode(RPM_SYS3_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(RPM_SYS3_PIN), handle_RPM_SYS3, CHANGE);
     FAN_SYS3.millis = millis();
   #endif
   #ifdef RPM_SYS4_PIN
-    resourcesAddItem(String("sys4"));
+    resourcesAddItem("sys4", RPM_SYS4_PIN);
     pinMode(RPM_SYS4_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(RPM_SYS4_PIN), handle_RPM_SYS4, CHANGE);
     FAN_SYS4.millis = millis();
   #endif
-  resourcesAddArray(String("rpm"));
+  resourcesAddArray("rpm");
 }
 
 void update_rpm(volatile rpm_data& FAN, long millis_count){

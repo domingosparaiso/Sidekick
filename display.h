@@ -1,8 +1,8 @@
 #ifndef DISPLAY_H
   #define DISPLAY_H 1
 
-  #define DISPLAY_NONE 0           // Nenhum display
-  #define DISPLAY_SERIAL 1         // Sem display, mas envia mensagens pela serial
+  #define DISPLAY_NONE 0           // No display
+  #define DISPLAY_SERIAL 1         // No display,send messages by Serial console
   #define DISPLAY_SSD1306_128X32 2 // OLED [SSD1306] 128x32
   #define DISPLAY_SSD1306_128X64 3 // OLED [SSD1306] 128x64
   #define DISPLAY_SSH1106 4        // OLED [SSH1106] 128x64

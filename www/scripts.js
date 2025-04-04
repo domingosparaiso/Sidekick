@@ -23,6 +23,7 @@ function show(tab, tipo){
 		}
 	}
 	document.getElementById(tab).style.display = 'block';
+	if(tab == 'menu-config') show('tab-hardware','');
 }
 
 function desabilita_addr(desabilitar) {

@@ -49,10 +49,10 @@ const char *fileHtml = R"literal(
  </style>
 </head>
 <body>
-<h1>Upload de arquivo</h1>
-<a href=/>Home</a>&nbsp;&nbsp;<a href=# onclick='formatar();'>Formatar flash</a>
+<h1>File Upload</h1>
+<a href=/>Home</a>&nbsp;&nbsp;<a href=# onclick='formatar();'>Format flash</a>
 <hr>
-<div id='entrada'>
+<div id='entrypoint'>
 <form method='post' enctype='multipart/form-data'>
 <input name='file' type='file' multiple>
 <button type='submit'>Upload</button>
@@ -70,7 +70,7 @@ function handleSubmit(event) {
     const xhr = new XMLHttpRequest();
     const data = new FormData(form);
     xhr.upload.addEventListener('progress', (event) => {
-      document.getElementById('percent').innerHTML = 'Progresso: ' + ((event.loaded / event.total) * 100).toFixed(2,) + '%';
+      document.getElementById('percent').innerHTML = 'Progress: ' + ((event.loaded / event.total) * 100).toFixed(2,) + '%';
       if(event.loaded == event.total) {
         setTimeout(function() {
           location.reload();
@@ -79,7 +79,7 @@ function handleSubmit(event) {
     });
     xhr.open(method, url);
     xhr.send(data);
-    document.getElementById('entrada').style.display = "none";
+    document.getElementById('entrypoint').style.display = "none";
 }
 function fdel(fname) {
   console.log('Delete: ' + fname);
@@ -92,7 +92,7 @@ function fdel(fname) {
   }, 1500);
 }
 function formatar() {
-  if(confirm('Esta operacao vai apagar todos os arquivos e configuracoes')) {
+  if(confirm('This will be wipe all configurations and files on the storage, confirm?')) {
     window.location.href('/format');
   }
 }

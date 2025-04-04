@@ -11,7 +11,6 @@
 #include "Sidekick.h"
 #include "data.h"
 #include "wifi.h"
-#define LED_PIN 2
 
 WebServer server(80);
 int SIZE_config_data;
@@ -19,184 +18,101 @@ union config_union CFG;
 String serialNumber = "";
 String resourcesJson = "";
 String resourcesList = "";
-int wifi_method = CLIENT_WIFI;
 
-void activity() {
-  digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+// Change status LED (usually onboard LED)
+void activity(int mode) {
+  #ifdef LED_PIN
+    switch(mode) {
+      case INIT:
+        pinMode(LED_PIN, OUTPUT);
+        break;
+      case ON:
+        // Turn LED ON
+        digitalWrite(LED_PIN, LED_LEVEL_ON);
+        break;
+      case OFF:
+        // Turn LED OFF
+        digitalWrite(LED_PIN, LED_LEVEL_OFF);
+        break;
+      case FLASH:
+        // Change LED (ON/OFF)
+        digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+        break;
+    }
+  #endif
 }
 
 void setup() {
   long unsigned int espmac = ESP.getEfuseMac() >> 24;
   serialNumber = String(espmac, HEX);
   serialNumber.toUpperCase();
+
+  activity(INIT);
   delay(2000);
-  Serial.begin(115200);
-  pinMode(LED_PIN, OUTPUT);
-  activity();
-	while (!Serial && millis() < 5000);
-  delay(500);
-  activity();
-  Serial.println(F("\nPower ON"));
-	Serial.print(F("\Board "));
-	Serial.println(ARDUINO_BOARD);
-	Serial.print(F("CPU Frequency = "));
-	Serial.print(F_CPU / 1000000);
-	Serial.println(F(" MHz"));
+
+  // [display.ino] initialize serial over USB connection to display console messages
+  console_init();
+  delay(500);  
+
+  // Display init messages
+  console_log("\nPower ON\n\Board: ");
+  console_log(String(ARDUINO_BOARD));
+  console_log("\nCPU Frequency: ");
+  console_log(String(F_CPU / 1000000));
+  console_log(" MHz\nSerial Number: ");
+  console_log(String(serialNumber));
+  console_log("\n\nSidekick ");
+  console_log(String(VERSION));
+  console_log("\n");
+
+  // Initialize resource list
   resourcesJson = String("{\"board\": \"") + String(ARDUINO_BOARD) + 
                   String("\", \"mhz\":\"") + String(F_CPU / 1000000) +
                   String("\", \"display\":\"") + String(DISPLAY_NAME) + String("\",") +
-                  String("\"version\": \"") + String(VERSAO) + String("\",") +
+                  String("\"version\": \"") + String(VERSION) + String("\",") +
                   String("\"serialNumber\": \"") + String(serialNumber) + "\"";
- 
-  Serial.println(String(F("Device Serial: ")) + serialNumber);
-  inicializa_flash();  // data.ino (OK)
+
+  // [data.ino] Initialize SPIFFS data.ino
+  storage_init();
+  
+  // [display.ino] Initialize primary display
   display_init();
-  delay(1000);
-  activity();
-  Serial.println(F("Init flash device... [OK]"));
-  load_CFG(); // data.ino
-  delay(1000);
-  activity();
-  Serial.println("Load configuration... [OK]");
+  
+  // [data.ino] Load storage configuration
+  load_CFG();
+
+  // [button.ino] Initialize button configuration
   button_init();
-  Serial.println("Button init... [OK]");
+  
+  // [led.ino] Initialize read LED configuration
   led_init();
-  Serial.println("LED init... [OK]");
+
+  // [relay.ino] Initialize relay configuration
   relay_init();
-  Serial.println("Relay init... [OK]");
+
+  // [rpm.ino] Initialize RPM configuration
   rpm_init();
-  Serial.println("RPM init... [OK]");
+
+  // [temperature.ino] Initialize temperature configuration
   temperature_init();
-  Serial.println("Temperature init... [OK]");
+
+  // end of resource list
   resourcesJson += "}";
-  ///////////////////////////////////////// check_wifi(); // wifi.ino
+
+  // [wifi.ino] Try to connect with Wifi using CLI mode, use AP mode when fail or reconfigure mode
   connect_wifi();
-  server_setup(); // server.ino
-  Serial.println(F("System ready!\n"));
+
+  // [server.ino] Call webserver setup function
+  server_setup();
+
+  // Ready to use
+  console_log("System ready!\n");
 }
 
 void loop() {
-//  check_wifi(); // wifi.ino
-  server_loop(); // server.ino
+  // [server.ino] chain to server loop functions
+  server_loop();
+  // [wifi.ino] check if wifi is on, and try reconnect when lost connection
+  // check_wifi();
 }
 
-void connect_wifi() {
-  WiFi.begin("SOTELE#2Ghz", "mamusKa#76");
-  Serial.println(F("Conectando rede wifi "));
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    activity();
-    delay(500);
-  }
-  IPAddress ip(192,168,1,88);
-  IPAddress gateway(192,168,1,10);
-  IPAddress subnet(255,255,255,0);
-  IPAddress dns(192,168,1,10);
-  WiFi.config(ip, dns, gateway, subnet);
-  Serial.println("");
-  Serial.print(F("Conectado: "));
-  Serial.print(WiFi.localIP());
-  Serial.println(F("... [OK]"));
-}
-
-void wifi_connect(int connection_type) {
-  if(connection_type == CLIENT_WIFI) {
-    if(strlen(CFG.data.CLI.wifi.SSID)==0) {
-      strcpy(CFG.data.CLI.wifi.SSID,"SOTELE#2Ghz");
-      strcpy(CFG.data.CLI.wifi.password,"mamusKa#76");
-      CFG.data.CLI.IP[0]=192;CFG.data.CLI.IP[1]=168;CFG.data.CLI.IP[2]=1;CFG.data.CLI.IP[3]=88;
-      CFG.data.CLI.GW[0]=192;CFG.data.CLI.GW[1]=168;CFG.data.CLI.GW[2]=1;CFG.data.CLI.GW[3]=10;
-      CFG.data.CLI.MASK[0]=255;CFG.data.CLI.MASK[1]=255;CFG.data.CLI.MASK[2]=255;CFG.data.CLI.MASK[3]=0;
-      CFG.data.CLI.DNS[0]=192;CFG.data.CLI.DNS[1]=168;CFG.data.CLI.DNS[2]=1;CFG.data.CLI.DNS[3]=10;
-    }
-    WiFi.begin(CFG.data.CLI.wifi.SSID, CFG.data.CLI.wifi.password);
-    Serial.print(F("SSID: "));
-    Serial.println(CFG.data.CLI.wifi.SSID);
-    Serial.print(F("PASS: "));
-    Serial.println(CFG.data.CLI.wifi.password);
-    Serial.print(F("Conectando rede wifi "));
-    Serial.print(CFG.data.CLI.wifi.SSID);
-    int status_oled = STATUS_CONFIG_WIFI_1;
-    int retry_count = 50;
-    while (WiFi.status() != WL_CONNECTED) {
-      display_status(status_oled);
-      status_oled = (status_oled==STATUS_CONFIG_WIFI_1)?STATUS_CONFIG_WIFI_2:STATUS_CONFIG_WIFI_1;
-      Serial.print(".");
-      delay(500);
-      if(retry_count-- < 0) break;
-    }
-    Serial.println("");
-    if(WiFi.status() != WL_CONNECTED) {
-      Serial.println(F("Conexao wifi... [Falha]"));
-      display_status(STATUS_CONFIG_WIFI_ERROR);
-    } else {
-      display_status(STATUS_CONFIG_WIFI_OK);
-      if(!CFG.data.CLI.DHCP) {
-        IPAddress ip(CFG.data.CLI.IP[0], CFG.data.CLI.IP[1], CFG.data.CLI.IP[2], CFG.data.CLI.IP[3]);
-        IPAddress gateway(CFG.data.CLI.GW[0], CFG.data.CLI.GW[1], CFG.data.CLI.GW[2], CFG.data.CLI.GW[3]);
-        IPAddress subnet(CFG.data.CLI.MASK[0], CFG.data.CLI.MASK[1], CFG.data.CLI.MASK[2], CFG.data.CLI.MASK[3]);
-        IPAddress dns(CFG.data.CLI.DNS[0], CFG.data.CLI.DNS[1], CFG.data.CLI.DNS[2], CFG.data.CLI.DNS[3]);
-        WiFi.config(ip, dns, gateway, subnet);
-      }
-      Serial.print(F("Conectado: "));
-      Serial.print(WiFi.localIP().toString());
-      Serial.println(F("... [OK]"));
-      display_print(1, 1, F("Conectado"));
-      display_print(2, 1, WiFi.localIP().toString());
-    }
-  } else {
-    Serial.println(F("Iniciando wifi AP"));
-    IPAddress AP_LOCAL_IP(192, 168, 100, 1);
-    IPAddress AP_GATEWAY_IP(192, 168, 100, 1);
-    IPAddress AP_NETWORK_MASK(255, 255, 255, 0);
-    if(strlen(CFG.data.AP.SSID)==0 || strlen(CFG.data.AP.password)==0) {
-      strcpy(CFG.data.AP.SSID,"CONFIG_INIT");
-      strcpy(CFG.data.AP.password, "password");
-    }
-    Serial.println(F("Wifi AP"));
-    Serial.print(F("SSID: "));
-    Serial.println(CFG.data.AP.SSID);
-    Serial.print(F("Password: "));
-    Serial.println(CFG.data.AP.password);
-    if (!WiFi.softAP(CFG.data.AP.SSID, CFG.data.AP.password)) {
-      Serial.println(F("Erro definindo Wifi AP"));
-      Serial.println(F("Entrando em modo de recuperacao..."));
-      strcpy(CFG.data.AP.SSID,"CONFIG_INIT");
-      strcpy(CFG.data.AP.password, "password");
-      if (!WiFi.softAP(CFG.data.AP.SSID, CFG.data.AP.password)) {
-        Serial.println(F("Erro definindo Wifi AP em modo recuperacao"));
-        Serial.println(F("O sistema sera reiniciado em 10s"));
-        display_print(1, 1, F("Wifi AP Erro"));
-        display_print(2, 1, F("<reboot>"));
-        delay(10000);
-        Serial.println(F("<reboot>"));
-        display_status(STATUS_REBOOT);
-        ESP.restart();
-      }
-    }
-    WiFi.softAPConfig(AP_LOCAL_IP, AP_GATEWAY_IP, AP_NETWORK_MASK);
-    display_print(1, 1, CFG.data.AP.SSID);
-    display_print(2, 1, CFG.data.AP.password);
-    wifi_method = AP_WIFI;
-    Serial.print(F("Conectado: "));
-    Serial.print(WiFi.localIP());
-    Serial.println(F("... [OK]"));
-    display_print(1, 1, F("Conectado"));
-    display_print(2, 1, WiFi.localIP().toString());
-  }
-}
-
-void check_wifi() {
-  if(wifi_method == CLIENT_WIFI) {
-    if(WiFi.status() != WL_CONNECTED) {
-      Serial.println("Tentando conexao wifi...");
-      int retry_connect = 3;
-      while(WiFi.status() != WL_CONNECTED && retry_connect-- > 0) {
-        wifi_connect(CLIENT_WIFI);
-      }
-      if(WiFi.status() != WL_CONNECTED) {
-        wifi_connect(AP_WIFI);
-      }
-    }
-  } 
-}

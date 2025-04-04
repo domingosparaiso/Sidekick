@@ -1,18 +1,20 @@
 #include "Sidekick.h"
-// Read LED pins
+// Read LED pins from PC motherboard, used to check if the PC is on and if HDD still in use
 
+// Setup LED pins
 void led_init() {
+  console_log("LED init: ");
   #ifdef LED_POWER_PIN
-    resourcesAddItem(String("power"));
+    resourcesAddItem("power", LED_POWER_PIN);
     pinMode(LED_POWER_PIN, INPUT);
     digitalWrite(LED_POWER_PIN, LOW);
   #endif
   #ifdef LED_HDD_PIN
-  resourcesAddItem(String("hdd"));
+  resourcesAddItem("hdd", LED_HDD_PIN);
     pinMode(LED_HDD_PIN, INPUT);
     digitalWrite(LED_HDD_PIN, LOW);
   #endif
-  resourcesAddArray(String("led"));
+  resourcesAddArray("led");
 }
 
 #ifdef LED_POWER_PIN

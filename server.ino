@@ -93,41 +93,40 @@ void handleFileUpload() {
   }
 }
 
-String charToStr(uint8_t opt) {
-  String tabela = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  return(tabela.substring(opt, opt+1));
-}
-
 void configServerInit() {
 
-  // Página para upload que inicializa da atualização
+  // Upload page to flash a new firmware
   server.on("/upload", HTTP_GET, []() {
     server.send(200, "text/html", uploadHtml);
   });
 
-  // Reiniciar o dispositivo sem alterações
+  // Reboot the device
   server.on("/reboot", HTTP_GET, []() {
     server.send(200, "text/html", "<html><body><h1>Reboot in progress...</h1></body></html>");
     display_status(STATUS_REBOOT);
-    Serial.println("Reboot do servidor");
-    timeout_reboot = millis() + 5000;
+    console_log("Rebbot in progress...");
+    timeout_reboot = millis() + WAIT_TIME_TO_REBOOT;
   });
 
+  // Backend to update config parameters
   server.on("/config", HTTP_POST, reconfigure);
 
+  // Register all server endpoints from resources
   button_register();
   led_register();
   relay_register();
   rpm_register();
   temperature_register();
 
+  // return a json with all resources
   server.on("/resources.json", []() {
-    Serial.println("GET> resources.json");
+    //console_log("GET> resources.json\n");
     server.send(200, "application/json", resourcesJson);
   });
  
+  // return a json with actual configuration
   server.on("/config.json", []() {
-    Serial.println("GET> config.json");
+    // console_log("GET> config.json\n");
     String DHCPcfg = (CFG.data.CLI.DHCP)?String("dhcp"):String("fixo");
     String result =   "{ \"serverName\": \"" +       String(CFG.data.serverName) +         "\"," +
                         "\"CLI_wifi_SSID\":\"" +     String(CFG.data.CLI.wifi.SSID) +     "\"," +
@@ -155,7 +154,7 @@ void configServerInit() {
     server.send(200, "application/json", result);
   });
 
-  // Realiza a atualização do firmware
+  // Firmware update
   server.on(
     "/update", HTTP_POST,
     []() {
@@ -167,7 +166,7 @@ void configServerInit() {
     }
   );
 
-  // apagar arquivos do SPIFFS
+  // Delete files from SPIFFS storage
   server.on("/delete", []() {
     for (uint8_t i = 0; i < server.args(); i++) {
       if(String(server.argName(i)) == "arq") {
@@ -183,20 +182,20 @@ void configServerInit() {
     server.send(200, "text/plain", "");
   });
 
-  // formatar o SPIFFS
+  // SPIFFS format
   server.on("/format", []() {
     display_status(STATUS_FORMAT_FS);
-    Serial.println("<FORMAT>");
+    console_log("<STORAGE FORMAT>");
     if(SPIFFS.format()) {
-      server.send(200, "text/html", "<html><body>Armazenamento Flash formatado.<hr><a href=/home>Home</a></body></html>");
+      server.send(200, "text/html", "<html><body>Flash storage formated.<hr><a href=/home>Home</a></body></html>");
       display_status(STATUS_FORMAT_OK);
     } else {
-      server.send(200, "text/html", "<html><body>Falha ao formatar o armazenamento Flash.<hr><a href=/home>Home</a></body></html>");
+      server.send(200, "text/html", "<html><body>Error at Flash storage format.<hr><a href=/home>Home</a></body></html>");
       display_status(STATUS_FORMAT_ERROR);
     }
   });
 
-  // gerenciamento de arquivos
+  // Storage file management
   server.on("/fs", []() {
     String fsIndex = String(fileHtml);
     File root = SPIFFS.open("/");
@@ -212,19 +211,19 @@ void configServerInit() {
     server.send(200, "text/html", fsIndex + result);
   });
 
-  // upload de arquivos
+  // File upload
   server.on("/fs-upload", HTTP_POST, []() {
       server.sendHeader("Connection", "close");
       server.send(200, "text/plain", "OK");
     }
     , handleFileUpload);
 
-  // arquivos salvos no SPIFFS
+  // Retrieve files stored into SPIFFS
   server.serveStatic("/", SPIFFS, "/");
 
-  // url não encontrada, abre o index.html, se não existir, mostra um link para gerenciador de arquivos
+  // url not found, open index.html instead send a 404 error, if index.html doesn't exists, send a message to upload one
   server.onNotFound([]() {
-    String indexHtmlFS = "<html><body><h1>Arquivo 'index.html' n&atilde;o encontrado.</h1><hr><a href=/fs>Arquivos</a></body></html>";
+    String indexHtmlFS = "<html><body><h1>File 'index.html' not found.</h1><hr><a href=/fs>Upload Files</a></body></html>";
     if(SPIFFS.exists("/index.html")) {
       File storage = SPIFFS.open("/index.html", "r");
       if(storage) {
@@ -238,23 +237,40 @@ void configServerInit() {
   // enable CORS header in webserver results
   server.enableCORS(true);
 
-  // inicia o servidor web
+  // Start webserver
   server.begin();
 }
 
+// Check if a reboot request is pending
+void reboot_check() {
+ if(timeout_reboot > 0 && timeout_reboot < millis()) {
+  timeout_reboot = 0;
+  console_log("\n<REBOOT>\n\n");
+  delay(500);
+  ESP.restart();
+ }
+}
+
+// Send a result to browser as json
 void send_result_json(String result) {
   server.send(200, "application/json", "{ \"result\": \"" + result + "\"}");
 }
 
+// Webserver setup
 void server_setup() {
-  Serial.println("Setup do servidor");
+  console_log("--- Server setup\n");
   configServerInit();
-  Serial.println("Setup do servidor... [OK]");
+  Serial.println("Server setup... [OK]");
 }
 
+// Webserver loop
 void server_loop() {
+  // handle webserver clients
   server.handleClient();
+  // check pressed buttons
   button_check();
+  // check release relay timeouts
   relay_check();
-  if(timeout_reboot > 0 && timeout_reboot > millis()) ESP.restart();
+  // check pending reboot request
+  reboot_check();
 }

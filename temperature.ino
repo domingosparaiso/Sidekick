@@ -3,22 +3,23 @@
 // array [ CPU, SYS#1, SYS#2, SYS#3, SYS#4 ]
 
 void temperature_init() {
+  console_log("Temperature init: ");
   #ifdef TEMP_CPU_PIN
-    resourcesAddItem(String("cpu"));
+    resourcesAddItem("cpu", TEMP_CPU_PIN);
   #endif
   #ifdef TEMP_SYS1_PIN
-    resourcesAddItem(String("sys1"));
+    resourcesAddItem("sys1", TEMP_SYS1_PIN);
   #endif
   #ifdef TEMP_SYS2_PIN
-    resourcesAddItem(String("sys2"));
+    resourcesAddItem("sys2", TEMP_SYS2_PIN);
   #endif
   #ifdef TEMP_SYS3_PIN
-    resourcesAddItem(String("sys3"));
+    resourcesAddItem("sys3", TEMP_SYS3_PIN);
   #endif
   #ifdef TEMP_SYS4_PIN
-    resourcesAddItem(String("sys4"));
+    resourcesAddItem("sys4", TEMP_SYS4_PIN);
   #endif
-  resourcesAddArray(String("temperature"));
+  resourcesAddArray("temperature");
 }
 
 void temperature_register() {
