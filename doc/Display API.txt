@@ -1,2 +1,11 @@
 Message format used to communicate with displays
 
+display_print(line, column, text)
+
+display_status(status)
+
+display_data(message)
+
+C|CPU
+M|Memory
+D|Disk usage
