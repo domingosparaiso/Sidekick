@@ -1,6 +1,8 @@
 #include "Sidekick.h"
 #include "data.h"
 
+String resourcesStart = "";
+
 // Initialize the SPIFFS in flas memory, if we has no SPIFFS yet, format it!
 void storage_init() {
   if(!SPIFFS.begin(true)){
@@ -56,6 +58,10 @@ String getFile(String filename) {
   return(contents);
 }
 
+void resourcesHeader(String header_name) {
+  resourcesStart = header_name + " Init: ";
+}
+
 // Add a new resource value
 void resourcesAddValue(String item_name, String item_value) {
   resourcesJson += ",\"" + item_name + "\":\"" + item_value + "\"";
@@ -63,7 +69,11 @@ void resourcesAddValue(String item_name, String item_value) {
 
 // Add a new item value, used when create an array resource
 void resourcesAddItem(String item_value, int item_pin) {
-  if(resourcesList != "") resourcesList += ",";
+  if(resourcesList != "") {
+    resourcesList += ",";
+  } else {
+    console_log(resourcesStart);
+  }
   resourcesList += "\"" + item_value + "\"";
   console_log("(");
   console_log(item_value);
@@ -74,7 +84,9 @@ void resourcesAddItem(String item_value, int item_pin) {
 
 // Add an array resource and empty the item list
 void resourcesAddArray(String array_name) {
-  resourcesJson += ",\"" + array_name + "\":[" + resourcesList + "]";
+  if(resourcesList.length() > 0) {
+    resourcesJson += ",\"" + array_name + "\":[" + resourcesList + "]";
+    console_log("[OK]\n");
+  }
   resourcesList = "";
-  console_log("[OK]\n");
 }

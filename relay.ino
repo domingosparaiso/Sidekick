@@ -20,8 +20,13 @@ bool in_relay_check = false;
   long relay_reset_timeout = 0;
 #endif
 
+#ifdef RELAY_BACK_PIN
+  // timeout to clear backlight
+  long relay_backligth_timeout = 0;
+#endif
+
 void relay_init() {
-  console_log("Relay init: ");
+  resourcesHeader("Relay");
   #ifdef RELAY_POWER_PIN
     resourcesAddItem("power", RELAY_POWER_PIN);
     pinMode(RELAY_POWER_PIN, OUTPUT);
@@ -46,6 +51,10 @@ void relay_init() {
     resourcesAddItem("sys4", RELAY_SYS4_PIN);
     pinMode(RELAY_SYS4_PIN, OUTPUT);
   #endif
+  #ifdef RELAY_BACK_PIN
+    resourcesAddItem("backlight", RELAY_BACK_PIN);
+    pinMode(RELAY_BACK_PIN, OUTPUT);
+  #endif
   resourcesAddArray("relay");
 }
 
@@ -62,7 +71,6 @@ void relay_check() {
         #ifndef RELAY_RESET_PIN
           if(relay_power_off_timeout > 0 && relay_power_off_timeout > now) {
             relay_power_off_timeout = 0;
-            Serial.println("<Relay POWER: End>");
             digitalWrite(RELAY_POWER_PIN, (RELAY_POWER_LEVEL_ON==HIGH)?LOW:HIGH);
             relay_power_on_timeout = now + TIMEOUT_RESET_INTERVAL;
           }
@@ -77,8 +85,14 @@ void relay_check() {
     #ifdef RELAY_RESET_PIN
       if(relay_reset_timeout > 0 && relay_reset_timeout > now) {
         relay_reset_timeout = 0;
-        Serial.println("<Relay RESET: End>");
         digitalWrite(RELAY_RESET_PIN, (RELAY_RESET_LEVEL_ON==HIGH)?LOW:HIGH);
+      }
+    #endif
+    #ifdef RELAY_BACK_PIN
+      // turn off backligth on timeout
+      if(relay_backligth_timeout > 0 && relay_backligth_timeout > now) {
+        relay_backligth_timeout = 0;
+        digitalWrite(RELAY_BACK_PIN, (RELAY_BACK_LEVEL_ON==HIGH)?LOW:HIGH);
       }
     #endif
     in_relay_check = false;
@@ -143,6 +157,11 @@ void relay_set(int relay_port, int value) {
           level_on = RELAY_SYS4_LEVEL_ON;
           break;
       #endif
+      #ifdef RELAY_BACK_PIN
+        case RELAY_BACK_PIN:
+          level_on = RELAY_BACK_LEVEL_ON;
+          break;
+      #endif
       default:
         level_on = HIGH;
         break;
@@ -154,6 +173,9 @@ void relay_set(int relay_port, int value) {
         break;
       case RELAY_ON:
         digitalWrite(relay_port, level_on);
+        #ifdef RELAY_BACK_PIN
+          if(relay_port == RELAY_BACK_PIN) relay_backligth_timeout = millis() + BACKLIGHT_TIMEOUT;
+        #endif
         break;
       #ifdef RELAY_POWER_PIN
         case RELAY_POWER_OFF:
@@ -204,6 +226,10 @@ void relay_register() {
   #endif
   #ifdef RELAY_SYS4_PIN
     server.on("/relay/sys4", HTTP_GET, []() { relay_set(RELAY_SYS4_PIN, cmdString2Int(RELAY_SYS4_PIN, server.arg("cmd"))); });
-  #endif 
+  #endif
+  #ifdef RELAY_BACK_PIN
+    server.on("/backlight/off", HTTP_GET, []() { relay_set(RELAY_BACK_PIN, RELAY_OFF); });
+    server.on("/backlight/on", HTTP_GET, []() { relay_set(RELAY_BACK_PIN, RELAY_ON); });
+  #endif
 }
 

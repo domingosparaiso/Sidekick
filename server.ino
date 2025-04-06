@@ -46,6 +46,7 @@ void handleUpdate() {
 }
 
 void reconfigure() {
+  String seq;
   server.arg("serverName").toCharArray(CFG.data.serverName, 32);
   server.arg("password").toCharArray(CFG.data.password, 32);
   server.arg("AP_SSID").toCharArray(CFG.data.AP.SSID,32);
@@ -53,17 +54,22 @@ void reconfigure() {
   server.arg("CLI_wifi_SSID").toCharArray(CFG.data.CLI.wifi.SSID, 32);
   server.arg("CLI_wifi_password").toCharArray(CFG.data.CLI.wifi.password, 32);
   CFG.data.CLI.DHCP = (server.arg("CLI_DHCP")=="dhcp");
-  for(int c=1; c<=4; c++) {
-    String seq = String(c);
-    if(!CFG.data.CLI.DHCP) {
+  if(!CFG.data.CLI.DHCP) {
+    for(int c=1; c<=4; c++) {
+      seq = String(c);
       CFG.data.CLI.IP[c-1] = (uint8_t) server.arg(String("CLI_IP_")+seq).toInt(); //endereço IP
       CFG.data.CLI.MASK[c-1] = (uint8_t) server.arg(String("CLI_MASK_")+seq).toInt(); //mascara subrede
       CFG.data.CLI.GW[c-1] = (uint8_t) server.arg(String("CLI_GW_")+seq).toInt(); //gateway
       CFG.data.CLI.DNS[c-1] = (uint8_t) server.arg(String("CLI_DNS_")+seq).toInt(); //dns
     }
   }
+  for(int c=1; c<=5; c++) {
+    seq = String(c);
+    CFG.data.maptemp [c-1]= server.arg("TMAP_"+seq).toInt();
+  }
+  CFG.data.timeout_backlight = server.arg("timeout").toInt();
   save_CFG();
-  server.send(200, "text/html", "");
+  server.send(200, "text/html", "<html><body><div id=m>Configuration Saved</div></body><script></script>setTimeout(()=>{getElementeById('m').innerHTML='';},10000);</html>");
 }
 
 void handleFileUpload() {
@@ -127,6 +133,10 @@ void configServerInit() {
   // return a json with actual configuration
   server.on("/config.json", []() {
     // console_log("GET> config.json\n");
+    int countmap = 0;
+    #ifdef TEMP_WIRE_PIN
+      countmap = temperature_count;
+    #endif
     String DHCPcfg = (CFG.data.CLI.DHCP)?String("dhcp"):String("fixo");
     String result =   "{ \"serverName\": \"" +       String(CFG.data.serverName) +         "\"," +
                         "\"CLI_wifi_SSID\":\"" +     String(CFG.data.CLI.wifi.SSID) +     "\"," +
@@ -150,7 +160,14 @@ void configServerInit() {
                                        "\"" +        String(CFG.data.CLI.DNS[3]) +        "\"]," +
                         "\"AP_SSID\": \"" +          String(CFG.data.AP.SSID) +           "\"," +
                         "\"AP_password\": \"" +      String(CFG.data.AP.password) +       "\"," +
-                        "\"password\": \"" +         String(CFG.data.password) +          "\"}";
+                        "\"password\": \"" +         String(CFG.data.password) +          "\"," +
+                        "\"countmap\": \"" +         String(countmap) +                   "\"," +
+                        "\"map\": [\"" +             String(CFG.data.maptemp[0]) +        "\"," +
+                                       "\"" +        String(CFG.data.maptemp[1]) +        "\"," +
+                                       "\"" +        String(CFG.data.maptemp[2]) +        "\"," +
+                                       "\"" +        String(CFG.data.maptemp[3]) +        "\"," +
+                                       "\"" +        String(CFG.data.maptemp[4]) +        "\"]," +
+                        "\"timeout\": \"" +          String(CFG.data.timeout_backlight) + "\"}";
     server.send(200, "application/json", result);
   });
 

@@ -8,7 +8,7 @@ bool last_status_button_reconfigure = false;
 
 // Configure button pins
 void button_init() {
-  console_log("Button init: ");
+  resourcesHeader("Button");
   #ifdef BUTTON_POWER_PIN
     resourcesAddItem("power", BUTTON_POWER_PIN);
     #if VALUE_BUTTON_POWER == HIGH

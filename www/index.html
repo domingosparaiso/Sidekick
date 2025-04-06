@@ -10,83 +10,93 @@
 <img src='/logo.png' onclick='show_hide_main_menu();'>
 <div id='top-menu'>
 	<div class=menu>
-		<div class=item-menu-principal onclick="show('menu-controle','main');">
-			Controle
+		<div class=item-main-menu onclick="show('menu-control','main');">
+			Control
 		</div>
-		<div class=item-menu-principal onclick="show('menu-config','main');">
-			Configura&ccedil;&atilde;o
+		<div class=item-main-menu onclick="show('menu-setup','main');">
+			Setup
 		</div>
-		<div class=item-menu-principal onclick="show('menu-update','main');">
+		<div class=item-main-menu onclick="show('menu-update','main');">
 			Update
 		</div>
-		<div class=item-menu-principal onclick='filesystem();'>
-			Arquivos
+		<div class=item-main-menu onclick='filesystem();'>
+			Filesystem
 		</div>
-		<div class=item-menu-principal onclick='reboot();'>
+		<div class=item-main-menu onclick='reboot();'>
 			Reboot
 		</div>
 	</div>
 </div>
-<iframe id="formnull" name="formnull" style="display:none"></iframe>
-<form method='POST' action='/config' target='formnull' onsubmit='getports();'>
+<form method='POST' action='/setup' target='formnull'>
 
-<div class=janela id='menu-controle'>
+<div class='contents upper-menu' id='menu-control'>
 </div>
 
-<div class=janela id='menu-config'>
-	<div class=titulo>Configura&ccedil;&atilde;o</div>
+<div class='contents upper-menu' id='menu-setup'>
+	<div class=title>Setup</div>
 	<div class=menu>
-		<div class=item-menu-auxiliar onclick="show('tab-hardware','');">
-			Hardware
+		<div class=item-auxiliary-menu onclick="show('tab-configuration','');">
+			Configuration
 		</div>
-		<div class=separador></div>
-		<div class=item-menu-auxiliar onclick="show('tab-server','');">
-			Servidor
+		<div class=separator></div>
+		<div class=item-auxiliary-menu onclick="show('tab-server','');">
+			Server
 		</div>
-		<div class=separador></div>
-		<div class=grupo>Wifi
-			<div class=item-menu-auxiliar onclick="show('tab-wifi-cli','');">
+		<div class=separator></div>
+		<div class=group>Wifi
+			<div class=item-auxiliary-menu onclick="show('tab-wifi-cli','');">
 				Client
 			</div>
-			<div class=item-menu-auxiliar onclick="show('tab-wifi-ap','');">
+			<div class=item-auxiliary-menu onclick="show('tab-wifi-ap','');">
 				Access Point
 			</div>
 		</div>
-		<div class=separador></div>
-		<div class=item-menu-auxiliar>
-			<input type=submit value=' Salvar configura&ccedil;&atilde;o '>
+		<div class=separator></div>
+		<div class=item-auxiliary-menu onclick="show('tab-hardware','');">
+			Hardware
+		</div>
+		<div class=separator></div>
+		<div class=item-auxiliary-menu>
+			<input type=submit value=' Save configuration '><iframe id="formnull" name="formnull" style="height:20px;width:300px;border:none;"></iframe>
 		</div>
 	</div>
 </div>
 
-<div class=janela id='tab-server'>
-<div class=titulo>Identifica&ccedil;&atilde;o do Servidor</div>
+<div class='contents tab-menu' id='tab-configuration'>
+<div class=title>Configuration fixed by code</div>
+<div id='configuration-table'>
+</div>
+</div>
+</form>
+
+<div class='contents tab-menu' id='tab-server'>
+<div class=title>Server Identification</div>
 <table>
-<tr><td colspan=2>Informar a identifica&ccedil;&atilde;o do servidor</tr></td>
-<tr><td>Nome</td><td><input name='serverName' id='serverName' size=32></td></tr>
-<tr><td colspan=2>Senha usada para entrar no modo de configura&ccedil;&atilde;o</tr></td>
-<tr><td>Senha</td><td><input name='password' id='password' type=text size=20></td></tr>
+<tr><td colspan=2>Provide server name</tr></td>
+<tr><td>Server</td><td><input name='serverName' id='serverName' size=32></td></tr>
+<tr><td colspan=2>Password used to reconfigure</tr></td>
+<tr><td>Password</td><td><input name='password' id='password' type=text size=20></td></tr>
 </table>
 </div>
 
-<div class=janela id='tab-wifi-cli'>
-<div class=titulo>Par&acirc;metros Wifi - Modo Cliente</div>
+<div class='contents tab-menu' id='tab-wifi-cli'>
+<div class=title>Wifi parameters - Client Mode</div>
 <table>
 <tr><td>SSID</td><td><input name='CLI_wifi_SSID' id='CLI_wifi_SSID' type=text size=32></td></tr>
-<tr><td>Senha</td><td><input name='CLI_wifi_password' id='CLI_wifi_password' type=text size=32></td></tr>
+<tr><td>Password</td><td><input name='CLI_wifi_password' id='CLI_wifi_password' type=text size=32></td></tr>
 <tr><td colspan=2>TCP/IP: 
-<input type='radio' name='CLI_DHCP' id='CLI_DHCP1' value='dhcp' checked onclick='desabilita_addr(true);'>
+<input type='radio' name='CLI_DHCP' id='CLI_DHCP1' value='dhcp' checked onclick='disable_addr(true);'>
 <label for='CLI_DHCP1'>DHCP</label>
-<input type='radio' name='CLI_DHCP' id='CLI_DHCP2' value='fixo' onclick='desabilita_addr(false);'>
-<label for='CLI_DHCP2'>Fixo</label>
+<input type='radio' name='CLI_DHCP' id='CLI_DHCP2' value='fixed' onclick='disable_addr(false);'>
+<label for='CLI_DHCP2'>Fixed</label>
 </td></tr>
-<tr><td>Endere&ccedil;o</td><td>
+<tr><td>IPv4 Address</td><td>
 <input name='CLI_IP_1' id='CLI_IP_1' type=text size=3 disabled>.
 <input name='CLI_IP_2' id='CLI_IP_2' type=text size=3 disabled>.
 <input name='CLI_IP_3' id='CLI_IP_3' type=text size=3 disabled>.
 <input name='CLI_IP_4' id='CLI_IP_4' type=text size=3 disabled>
 </td></tr>
-<tr><td>M&aacute;scara</td><td>
+<tr><td>Netmask</td><td>
 <input name='CLI_MASK_1' id='CLI_MASK_1' type=text size=3 disabled>.
 <input name='CLI_MASK_2' id='CLI_MASK_2' type=text size=3 disabled>.
 <input name='CLI_MASK_3' id='CLI_MASK_3' type=text size=3 disabled>.
@@ -107,24 +117,75 @@
 </table>
 </div>
 
-<div class=janela id='tab-wifi-ap'>
-<div class=titulo>Par&acirc;metros Wifi - Modo Access Point</div>
+<div class='contents tab-menu' id='tab-wifi-ap'>
+<div class=title>Wifi parameters - Access Point Mode (reconfigure)</div>
 <table>
 <tr><td>SSID</td><td><input name='AP_SSID' id='AP_SSID' type=text size=32></td></tr>
-<tr><td>Senha</td><td><input name='AP_password' id='AP_password' type=text size=32></td></tr>
+<tr><td>Password</td><td><input name='AP_password' id='AP_password' type=text size=32></td></tr>
 </table>
 </div>
 
-<div class=janela id='tab-hardware'>
-<div class=titulo>Hardware - Configura&ccedil;&otilde;es fixas</div>
-<div id='hardware-table'>
-</div>
+<div class='contents tab-menu' id='tab-hardware'>
+<div class=title>Hardware</div>
+<table>
+<td><td colspan=2>Temperature sensors</td></tr>
+<tr><td>Sensor #1</td><td><select name='TMAP_1'>
+<option value=''>-- select --</option>
+<option value='cpu'>CPU</option>
+<option value='sys1'>System #1</option>
+<option value='sys1'>System #2</option>
+<option value='sys1'>System #3</option>
+<option value='sys1'>System #4</option>
+</select></td></tr>
+<tr><td>Sensor #1</td><td><select name='TMAP_1'>
+<option value=''>-- select --</option>
+<option value='cpu'>CPU</option>
+<option value='sys1'>System #1</option>
+<option value='sys1'>System #2</option>
+<option value='sys1'>System #3</option>
+<option value='sys1'>System #4</option>
+</select></td></tr>
+<tr><td>Sensor #2</td><td><select name='TMAP_2'>
+<option value=''>-- select --</option>
+<option value='cpu'>CPU</option>
+<option value='sys1'>System #1</option>
+<option value='sys1'>System #2</option>
+<option value='sys1'>System #3</option>
+<option value='sys1'>System #4</option>
+</select></td></tr>
+<tr><td>Sensor #3</td><td><select name='TMAP_3'>
+<option value=''>-- select --</option>
+<option value='cpu'>CPU</option>
+<option value='sys1'>System #1</option>
+<option value='sys1'>System #2</option>
+<option value='sys1'>System #3</option>
+<option value='sys1'>System #4</option>
+</select></td></tr>
+<tr><td>Sensor #4</td><td><select name='TMAP_4'>
+<option value=''>-- select --</option>
+<option value='cpu'>CPU</option>
+<option value='sys1'>System #1</option>
+<option value='sys1'>System #2</option>
+<option value='sys1'>System #3</option>
+<option value='sys1'>System #4</option>
+</select></td></tr>
+<tr><td>Sensor #5</td><td><select name='TMAP_5'>
+<option value=''>-- select --</option>
+<option value='cpu'>CPU</option>
+<option value='sys1'>System #1</option>
+<option value='sys1'>System #2</option>
+<option value='sys1'>System #3</option>
+<option value='sys1'>System #4</option>
+</select></td></tr>
+<td><td colspan=2>Backlight</td></tr>
+<tr><td>Timeout (ms)</td><td><input type='text' name='timeout' size=10></td></tr>
+</table>
 </div>
 </form>
 
-<div class=janela id='menu-update'>
-<div class=titulo>Update firmware</div>
-<a href='/upload'>Clique aqui para entrar na p&aacute;gina de update de firmware...</a>
+<div class='contents upper-menu' id='menu-update'>
+<div class=title>Update firmware</div>
+<a href='/upload'>Click here to open firmware update page...</a>
 </div>
 
 </div>

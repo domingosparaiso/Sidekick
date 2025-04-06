@@ -27,7 +27,7 @@ void IRAM_ATTR handle_RPM_SYS4() { FAN_SYS4.counter++; }
 #endif
 
 void rpm_init() {
-  console_log("RPM init: ");
+  resourcesHeader("RPM");
   tickerSecond.attach(1, updateRPMs);  
   #ifdef RPM_CPU_PIN
     resourcesAddItem("cpu", RPM_CPU_PIN);

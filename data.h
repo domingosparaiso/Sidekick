@@ -20,6 +20,8 @@
     char password[32];
     wifi_config AP;
     wifi_client CLI;
+    uint8_t maptemp[5];
+    int timeout_backlight;
   };
 
   union config_union {

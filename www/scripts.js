@@ -9,29 +9,29 @@ function show_hide_main_menu(){
 	} else {
 		topmenu.style.display = 'block';
 	}
-	show('menu-controle','main');
+	show('menu-control','main');
 }
 
-function show(tab, tipo){
-	const main_menu = ['menu-controle','menu-config','menu-update'];
-	const conf_menu = ['tab-server','tab-wifi-cli','tab-wifi-ap','tab-hardware'];
-	for (let i = 0; i < 4; i++) {
-		document.getElementById(conf_menu[i]).style.display = 'none';
+function show(tab, tab_type){
+	const collection_tab = document.getElementsByClassName("tab-menu");
+	for (let i = 0; i < collection_tab.length; i++) {
+		collection_tab[i].style.display = 'none';
 	}
-	if(tipo=='main') {
-		for (let i = 0; i < 3; i++) {
-			document.getElementById(main_menu[i]).style.display = 'none';
+	if(tab_type=='main') {
+		const collection_menu = document.getElementsByClassName("upper-menu");
+		for (let i = 0; i < collection_menu.length; i++) {
+			collection_menu[i].style.display = 'none';
 		}
 	}
 	document.getElementById(tab).style.display = 'block';
-	if(tab == 'menu-config') show('tab-hardware','');
+	if(tab == 'menu-setup') show('tab-configuration','');
 }
 
-function desabilita_addr(desabilitar) {
+function disable_addr(disable) {
 	const itens=['CLI_IP','CLI_MASK','CLI_GW','CLI_DNS'];
 	for(let i=0;i<4;i++) {
 		for(let c=1;c<=4;c++) {
-			document.getElementById(itens[i] + '_' + c).disabled = desabilitar;
+			document.getElementById(itens[i] + '_' + c).disabled = disable;
 		}
 	}
 }
@@ -60,7 +60,7 @@ function filesystem() {
 }
 
 function update_fields(data) {
-	field_list = ['serverName','CLI_wifi_SSID','CLI_wifi_password','AP_SSID','AP_password','password'];
+	field_list = ['serverName','CLI_wifi_SSID','CLI_wifi_password','AP_SSID','AP_password','password', 'timeout'];
 	for(i = 0; i < field_list.length; i++) {
 		key = field_list[i];
 		value = data[key];
@@ -68,13 +68,25 @@ function update_fields(data) {
 	}
 	document.getElementById('CLI_DHCP1').checked=(data.CLI_DHCP=='dhcp');
 	document.getElementById('CLI_DHCP2').checked=(data.CLI_DHCP=='fixo');
-	desabilita_addr(data.CLI_DHCP=='dhcp');
+	disable_addr(data.CLI_DHCP=='dhcp');
 	list4fields =[ 'CLI_IP','CLI_MASK','CLI_GW','CLI_DNS' ];
 	for(i = 1; i <= 4; i++) {
 		for(j = 0; j < 4; j++) {
 			key = list4fields[j] + '_' + i;
 			value = data[list4fields[j]][i-1];
 			document.getElementById(key).value = value;
+		}
+	}
+	maplist =[ '', 'cpu', 'sys1', 'sys2', 'sys3', 'sys4' ];
+	for(i = 1; i <= 5; i++) {
+		key = 'TMAP_' + i;
+		mapindex = data['map'][i-1];
+		value = maplist[mapindex];
+		document.getElementById(key).value = value;
+		if(i > data.countmap) {
+			document.getElementById(key).style.display = 'none';
+		} else {
+			document.getElementById(key).style.display = 'block';
 		}
 	}
 }
@@ -113,23 +125,23 @@ function update_resources(data) {
 	temperature = make_list(data.temperature);
 	Htable = "<table>" +
 		"<tr><td>Serial</td><td>" + data.serialNumber + "</td></tr>" +
-		"<tr><td>Vers&atilde;o</td><td>" + data.version + "</td></tr>" +
-		"<tr><td>Placa</td><td>" + data.board + "</td></tr>" +
-		"<tr><td>Frequ&ecirc;ncia</td><td>" + data.mhz + " Mhz</td></tr>" +
+		"<tr><td>Version</td><td>" + data.version + "</td></tr>" +
+		"<tr><td>Board</td><td>" + data.board + "</td></tr>" +
+		"<tr><td>Frquency</td><td>" + data.mhz + " Mhz</td></tr>" +
 		"<tr><td>Display</td><td>" + data.display + "</td></tr>" +
-		"<tr><td>Bot&otilde;es</td><td>" + buttons + "</td></tr>" +
+		"<tr><td>Buttons</td><td>" + buttons + "</td></tr>" +
 		"<tr><td>Leds</td><td>" + leds + "</td></tr>" +
-		"<tr><td>Rel&eacute;s</td><td>" + relays + "</td></tr>" +
+		"<tr><td>Relays</td><td>" + relays + "</td></tr>" +
 		"<tr><td>Coolers</td><td>" + rpms + "</td></tr>" +
-		"<tr><td>Temperatura</td><td>" + temperature + "</td></tr>" +
+		"<tr><td>Temperature</td><td>" + temperature + "</td></tr>" +
 		"</table>";
 	document.getElementById('hardware-table').innerHTML = Htable;
-	document.getElementById('menu-controle').innerHTML = make_buttons(data.button);
+	document.getElementById('menu-control').innerHTML = make_buttons(data.button);
 }
 
 function update_page() {
 	updatepg++;
-	if(updatepg == 2) show('menu-controle','main');
+	if(updatepg == 2) show('menu-control','main');
 }
 
 window.onload = function() {

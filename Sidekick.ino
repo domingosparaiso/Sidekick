@@ -103,6 +103,9 @@ void setup() {
   // [wifi.ino] Try to connect with Wifi using CLI mode, use AP mode when fail or reconfigure mode
   connect_wifi();
 
+  // Initialize date/time using NTP server
+  datetime_init();
+
   // [server.ino] Call webserver setup function
   server_setup();
 

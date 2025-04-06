@@ -3,7 +3,7 @@
 
 // Setup LED pins
 void led_init() {
-  console_log("LED init: ");
+  resourcesHeader("LED");
   #ifdef LED_POWER_PIN
     resourcesAddItem("power", LED_POWER_PIN);
     pinMode(LED_POWER_PIN, INPUT);

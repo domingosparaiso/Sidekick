@@ -1,0 +1,44 @@
+/upload -> Firmware upload page (OTA)
+/reboot -> Reboot device
+/config -> Configuration backend, receive data from form
+/resources.json -> All resources available in compile time
+/config.json -> Actual configurarion in Json format
+/update -> Firmware update backend (OTA)
+/delete -> Dele files from SPIFFS storage
+/format -> Format SPIFFS storage (delete all files)
+/fs -> Show SPIFFS storage file list
+/fs-upload -> File upload backend for SPIFFS storage
+
+/button/power -> Press the power button (liga/desliga)
+/button/get/power -> Read pressed power button value
+/button/reset/set -> Press the reset button, if there is no relay reset, use a sequence of power off/power on
+/button/get/reset -> Read pressed reset button value
+/button/reconfigure/set -> Reconfigure WiFi into Access Point (AP) mode
+/button/get/reconfigure -> Read pressed reconfigure button value
+
+/led/power -> Read the Power LED value (ON/OFF)
+/led/hdd -> Read the HDD LED value (ON/OFF)
+
+*** To send values to relays, the COMMAND values can be one from this list:
+ON -> Turn ON relay and stay in this state
+OFF -> Turn OFF relay and stay in this state
+POWER_ON -> Turn ON relay, after a timeout, turn it OFF (used by Power relay)
+POWER_OFF -> Turn OFF relay, after a timeout, turn it OFF (used by Power relay)
+POWER_OFF_ON -> Turn ON relay, wait and turn OFF, wait and turn ON again, wait and turn OFF (used to restart the computer when no reset relay exists)
+RESET -> Turn ON relay, after a timeout, turn it OFF (used by Reset relay)
+*** All times are configured in "config.h" file, values in ms
+/relay/power?cmd=<COMMAND> -> send command to Power relay
+/relay/reset?cmd=<COMMAND> -> send command to Reset relay
+/relay/sys1?cmd=<COMMAND> -> send command to relay connected to cooler at System #1
+/relay/sys2?cmd=<COMMAND> -> send command to relay connected to cooler at System #2
+/relay/sys3?cmd=<COMMAND> -> send command to relay connected to cooler at System #3
+/relay/sys4?cmd=<COMMAND> -> send command to relay connected to cooler at System #4
+
+/rpm/cpu -> Get CPU coller RPM value
+/rpm/sys1 -> Get System #1 coller RPM value
+/rpm/sys2 -> Get System #2 coller RPM value
+/rpm/sys3 -> Get System #3 coller RPM value
+/rpm/sys4 -> Get System #4 coller RPM value
+
+/temperature?location=<LOCATION> -> LOCATION: location of the sensor (cpu, sys1, sys2, sys3 ou sys4)
+/temperature/map?pos=<POS>&map=<MAP> -> POS: sensor position between 1 and 5, identifies the sensor, MAP: sensor location (idem LOCATION in relay)

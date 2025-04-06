@@ -50,6 +50,12 @@
   //#define RELAY_SYS4_PIN 13
   //#define RELAY_SYS4_LEVEL_ON LOW
 
+  // Relay supply backligth to display
+  //#define RELAY_BACK_PIN 13
+  //#define RELAY_BACK_LEVEL_ON LOW
+  // Time to turn off backlight in ms
+  //#define BACKLIGHT_TIMEOUT 10000  
+
     // Timeout to release power button when turn on PC
   #define TIMEOUT_RELAY_ON 2000
   // Timeout to release power button when turn off PC
@@ -98,5 +104,17 @@
   // default password used to enter configuration
   #define DEFAULT_PASSWORD "password"
   // -------------------------------------------------------------------------------
+
+  // --- datetime.ino --------------------------------------------------------------
+  // Date and time configuration
+  // Timezone (https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h)
+  //          (https://github.com/mcxiaoke/ESPDateTime/blob/master/src/DateTimeTZ.h)
+  #define TIMEZONE "<-03>3"
+  // NTP servers - list of NTP server to be used
+  #define NTPSERVERS "a.st1.ntp.br", "b.st1.ntp.br", "c.st1.ntp.br", "d.st1.ntp.br"
+  #define DATE_FORMAT "%d/%m/%y"
+  #define TIME_FORMAT "%M:%M:%S"
+  // -------------------------------------------------------------------------------
   
+
 #endif // <EOF>

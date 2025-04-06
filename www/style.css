@@ -1,4 +1,4 @@
-.titulo {
+.title {
 	color: gray;
 	font-size: 20;
 }
@@ -12,34 +12,34 @@
 	border-style: solid;
 	border-width: 1px;
 }
-.grupo {
+.group {
 	font-size: 15;
 	color: #A0A0A0;
 	vertical-align: top;
 	display: flex;
 	padding: 5px;
 }
-.separador {
+.separator {
 	border-style: solid;
 	border-width: 0px 1px 0px 0px;
 	border-color: black;
 	padding-right: 5px;
 }
-.item-menu-principal {
+.item-main-menu {
 	padding: 5px;
 	font-size: 20px;
 	color: blue;
 	text-decoration-line: underline;
 	cursor: pointer;
 }
-.item-menu-auxiliar {
+.item-auxiliary-menu {
 	padding: 5px;
 	font-size: 15px;
 	color: red;
 	text-decoration-line: underline;
 	cursor: pointer;
 }
-.janela {
+.contents {
 	display: none;
 	background-color: #F0F0F0;
 }
