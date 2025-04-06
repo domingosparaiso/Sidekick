@@ -70,14 +70,10 @@
   // -------------------------------------------------------------------------------
 
   // --- temperature.ino -----------------------------------------------------------
-  // Port to communicate with DA18B20 temperature sensors using 1Wire protocol
-  // Even we can use the same port to communicate with all sensors, the choice of
-  // use just one per wire was to sure what sensor we are communicating, no doubt.
-  //#define TEMP_CPU_PIN 19
-  //#define TEMP_SYS1_PIN 20
-  //#define TEMP_SYS2_PIN 21
-  //#define TEMP_SYS3_PIN 22
-  //#define TEMP_SYS4_PIN 23
+  // Port to communicate with DA18B20 temperature sensors using 1Wire protocol.
+  // With running hardware we can enter configuration web page and link all
+  // temperarure sensors with their locations (cpu, sys1, sys2, ...)
+  //#define TEMP_WIRE_PIN 19
   // -------------------------------------------------------------------------------
 
   // --- uart.ino ------------------------------------------------------------------

@@ -40,9 +40,6 @@ RESET -> Liga o relay, depois de um tempo desliga (usado no relay Reset)
 /rpm/sys3 -> Retorna o valor de RPM do cooler System #3
 /rpm/sys4 -> Retorna o valor de RPM do cooler System #4
 
-/temperature/cpu -> Retorna a temperatura do sensor na CPU
-/temperature/sys1 -> Retorna a temperatura do sensor System #1
-/temperature/sys2 -> Retorna a temperatura do sensor System #2
-/temperature/sys3 -> Retorna a temperatura do sensor System #3
-/temperature/sys4 -> Retorna a temperatura do sensor System #4
+/temperature?location=<LOCATION> -> LOCATION: localização (cpu, sys1, sys2, sys3 ou sys4)
+/temperature/map?pos=<POS>&map=<MAP> -> POS: valor entre 1 e 5 que identifica o sensor, MAP: localização (idem LOCATION)
 
