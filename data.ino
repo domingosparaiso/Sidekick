@@ -17,6 +17,7 @@ void storage_init() {
 void save_CFG() {
   File storage = SPIFFS.open("/config.bin", "wb");
   if (storage) {
+    console_log("<SAVE CONFIG>\n");
     storage.write(CFG.raw, sizeof(config_data));
   }
   storage.close();

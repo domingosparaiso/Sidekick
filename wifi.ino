@@ -1,6 +1,5 @@
 #include "Sidekick.h"
 
-int wifi_mode = WIFI_CLI;
 long next_check_wifi = 0;
 
 void connect_wifi() {
@@ -79,9 +78,7 @@ void connect_wifi_ap() {
   display_print(2, 1, CFG.data.AP.password);
   wifi_mode = WIFI_AP;
 
-  console_log("\nConnected: [");
-  console_log(WiFi.localIP().toString());
-  console_log("] [OK]\n");
+  console_log("\nConnected: [192.168.100.1]... [OK]\n");
   display_print(1, 1, F("WiFi AP"));
   display_print(2, 1, WiFi.localIP().toString());
 }

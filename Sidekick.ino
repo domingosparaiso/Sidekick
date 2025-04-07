@@ -12,6 +12,7 @@
 #include "data.h"
 #include "wifi.h"
 
+int wifi_mode = WIFI_CLI;
 WebServer server(80);
 int SIZE_config_data;
 union config_union CFG;
@@ -65,7 +66,13 @@ void setup() {
   console_log("\n\nSidekick ");
   console_log(String(VERSION));
   console_log("\n");
-
+/*
+  console_log("# format...");
+  SPIFFS.format();
+  console_log(" [OK]\n<REBOOT>");
+  delay(1000);
+  ESP.restart();
+*/
   // Initialize resource list
   resourcesJson = String("{\"board\": \"") + String(ARDUINO_BOARD) + 
                   String("\", \"mhz\":\"") + String(F_CPU / 1000000) +

@@ -6,6 +6,10 @@ void datetime_init() {
   bool ntp_ok = false;
   int count_ntps = (sizeof(ntpservers)/sizeof(char *));
   int i = 0;
+  if(wifi_mode == WIFI_AP) {
+    console_log("Can't get datetime in AP Mode\n");
+    return;
+  }
   console_log("Timezone: ");
   console_log(TIMEZONE);
   while(!ntp_ok && i<count_ntps) {
@@ -20,6 +24,7 @@ void datetime_init() {
     } else {
       console_log(" [Fail]");
     }
+    i++;
   }
   console_log("\nDatetime...");
   if(!ntp_ok) {

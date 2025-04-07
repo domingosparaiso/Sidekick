@@ -105,37 +105,40 @@ function make_buttons(data) {
 	return(result);
 }
 
-function make_list(data) {
+function make_list(header, data) {
 	var result = "";
-	var sep = "";
-	for(i = 0; i < data.length; i++) {
-		value = data[i];
-		result += sep + value;
-		sep = ", ";
+	if(data != undefined && data.length > 0) {
+		result = "<tr><td>" + header + ":</td><td>[ ";
+		var sep = "";
+		for(i = 0; i < data.length; i++) {
+			value = data[i];
+			result += sep + value;
+			sep = ", ";
+		}
+		result += " ]</td></tr>";
 	}
-	if(data.length==0) result = "-";
 	return(result);
 }
 
 function update_resources(data) {
-	buttons = make_list(data.button);
-	leds = make_list(data.led);
-	relays = make_list(data.relay);
-	rpms = make_list(data.rpm);
-	temperature = make_list(data.temperature);
+	buttons = make_list('Buttons', data.button);
+	leds = make_list('Leds', data.led);
+	relays = make_list('Relays', data.relay);
+	rpms = make_list('Coolers', data.rpm);
+	temperature = make_list('Temperature', data.temperature);
 	Htable = "<table>" +
 		"<tr><td>Serial</td><td>" + data.serialNumber + "</td></tr>" +
 		"<tr><td>Version</td><td>" + data.version + "</td></tr>" +
 		"<tr><td>Board</td><td>" + data.board + "</td></tr>" +
 		"<tr><td>Frquency</td><td>" + data.mhz + " Mhz</td></tr>" +
 		"<tr><td>Display</td><td>" + data.display + "</td></tr>" +
-		"<tr><td>Buttons</td><td>" + buttons + "</td></tr>" +
-		"<tr><td>Leds</td><td>" + leds + "</td></tr>" +
-		"<tr><td>Relays</td><td>" + relays + "</td></tr>" +
-		"<tr><td>Coolers</td><td>" + rpms + "</td></tr>" +
-		"<tr><td>Temperature</td><td>" + temperature + "</td></tr>" +
+		buttons +
+		leds +
+		relays +
+		rpms +
+		temperature +
 		"</table>";
-	document.getElementById('hardware-table').innerHTML = Htable;
+	document.getElementById('configuration-table').innerHTML = Htable;
 	document.getElementById('menu-control').innerHTML = make_buttons(data.button);
 }
 
