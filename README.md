@@ -35,4 +35,4 @@ I'm testing on ESP32 WROOM (30 pin model) and ESP-01 (ESP8266) with one relay bo
 
 A complete connection diagram using ESP32.
 
-![Esquema com ESP32](https://github.com/domingosparaiso/Sidekick/blob/main/doc/Esquema.jpg)
+![Connection diagram using ESP32](https://github.com/domingosparaiso/Sidekick/blob/main/doc/Esquema.jpg)
