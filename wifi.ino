@@ -1,3 +1,7 @@
+#include <WiFi.h>
+#include <WiFiAP.h>
+#include <WebServer.h>
+#include "wificonfig.h"
 #include "Sidekick.h"
 
 long next_check_wifi = 0;

@@ -1,21 +1,8 @@
-#include <EEPROM.h>
-#include <WiFi.h>
-#include <WiFiAP.h>
-#include <WebServer.h>
-#include <Update.h>
-#include <uri/UriBraces.h>
-#include "FS.h"
-#include "SPIFFS.h"
 #include "display.h"
 #include "config.h"
 #include "Sidekick.h"
 #include "data.h"
-#include "wifi.h"
 
-int wifi_mode = WIFI_CLI;
-WebServer server(80);
-int SIZE_config_data;
-union config_union CFG;
 bool block_loop = false;
 String serialNumber = "";
 String resourcesJson = "";
@@ -128,4 +115,3 @@ void loop() {
     check_wifi();
   }
 }
-

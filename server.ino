@@ -1,4 +1,6 @@
+#include <Update.h>
 #include "Sidekick.h"
+#include "wificonfig.h"
 #include "html.h"
 
 uint8_t otaDone = 0;

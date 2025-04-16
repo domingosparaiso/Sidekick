@@ -1,4 +1,5 @@
 #include "Sidekick.h"
+#include "wificonfig.h"
 // Relay control
 // array [ POWER, SYS#1, SYS#2, SYS#3, SYS#4 ]
 

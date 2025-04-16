@@ -1,4 +1,5 @@
 #include "Sidekick.h"
+#include "wificonfig.h"
 // Serial UART communication
 
 void uart_init() {

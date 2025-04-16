@@ -1,5 +1,4 @@
-#ifndef HTML_H
-  #define HTML_H 1
+#pragma once
 
 const char *uploadHtml = R"literal(
   <!DOCTYPE html>
@@ -99,4 +98,4 @@ function formatar() {
 </script>
 )literal";
 
-#endif // <EOF>
+// <EOF>

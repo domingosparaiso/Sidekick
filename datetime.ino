@@ -1,4 +1,5 @@
 #include "Sidekick.h"
+#include "wificonfig.h"
 #include <ESPDateTime.h>
 
 void datetime_init() {

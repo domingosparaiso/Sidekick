@@ -1,4 +1,5 @@
 #include "Sidekick.h"
+#include "wificonfig.h"
 // RPM control
 // array [ CPU, SYS#1, SYS#2, SYS#3, SYS#4 ]
 #include <Ticker.h>

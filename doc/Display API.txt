@@ -9,3 +9,4 @@ display_data(message)
 C|CPU
 M|Memory
 D|Disk usage
+

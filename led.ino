@@ -1,4 +1,5 @@
 #include "Sidekick.h"
+#include "wificonfig.h"
 // Read LED pins from PC motherboard, used to check if the PC is on and if HDD still in use
 
 // Setup LED pins

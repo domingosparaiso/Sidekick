@@ -1,4 +1,5 @@
 #include "Sidekick.h"
+#include "wificonfig.h"
 // Buttons control
 
 bool in_button_check = false;

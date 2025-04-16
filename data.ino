@@ -1,7 +1,12 @@
+#include <EEPROM.h>
+#include <FS.h>
+#include <SPIFFS.h>
 #include "Sidekick.h"
 #include "data.h"
 
 String resourcesStart = "";
+int SIZE_config_data;
+union config_union CFG;
 
 // Initialize the SPIFFS in flas memory, if we has no SPIFFS yet, format it!
 void storage_init() {

@@ -1,4 +1,5 @@
 #include "Sidekick.h"
+#include "wificonfig.h"
 #include <DS18B20.h>
 
 #ifdef TEMP_WIRE_PIN
