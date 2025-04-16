@@ -1,7 +1,7 @@
 #include "display.h"
 #include "config.h"
 #include "Sidekick.h"
-#include "data.h"
+#include "storage.h"
 
 bool block_loop = false;
 String serialNumber = "";
@@ -32,8 +32,13 @@ void activity(int mode) {
 }
 
 void setup() {
-  long unsigned int espmac = ESP.getEfuseMac() >> 24;
-  serialNumber = String(espmac, HEX);
+  #ifdef ESP32
+    long unsigned int espmac = ESP.getEfuseMac() >> 24;  
+    serialNumber = String(espmac, HEX);
+  #endif
+  #ifdef ESP8266
+    serialNumber = String(ESP.getChipId(), HEX);
+  #endif
   serialNumber.toUpperCase();
 
   activity(INIT);
@@ -44,7 +49,7 @@ void setup() {
   delay(500);  
 
   // Display init messages
-  console_log("\nPower ON\n\Board: ");
+  console_log("\nPower ON\nBoard: ");
   console_log(String(ARDUINO_BOARD));
   console_log("\nCPU Frequency: ");
   console_log(String(F_CPU / 1000000));

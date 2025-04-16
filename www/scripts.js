@@ -92,15 +92,57 @@ function update_fields(data) {
 }
 
 function button_action(button_name) {
-	console.log('Button: ' + button_name);
 	fetch('/button/' + button_name);
 }
 
-function make_buttons(data) {
+function update_led(name) {
+	fetch('/led/' + name)
+		.then(x => x.json())
+		.then((j) => {
+			out = j['led_' + name];
+			if(out == 'ON') delclass = 'led_OFF';
+			if(out == 'OFF') delclass = 'led_ON';
+			el = document.getElementById('led_' + name);
+			if(el.classList.contains(delclass)) el.classList.remove(delclass);
+			el.classList.add('led_' + out);
+			el.innerHTML = out;
+		}).catch(err => console.error(err));
+}
+
+function update_led_power() {
+	update_led('power');
+}
+
+function update_led_hdd() {
+	update_led('hdd');
+}
+
+function make_buttons(data_buttons, data_leds) {
 	var result = "";
-	for(i = 0; i < data.length; i++) {
-		value = data[i];
-		result += "<div class='control-button' onclick=button_action('" + value + "')>" + value + "</div>";
+	var powerButton = false;
+	if(data_buttons != undefined) {
+		for(i = 0; i < data_buttons.length; i++) {
+			value = data_buttons[i];
+			if(value == 'power') powerButton = true;
+			result += "<div class='control-button' onclick=button_action('" + value + "')>" + value + "</div>";
+		}
+	}
+	if(data_leds != undefined) {
+		for(i = 0; i < data_leds.length; i++) {
+			value = data_leds[i];
+			result += "<div class='control-led led_OFF' id='led_" + value + "'>OFF</div>";
+			switch(value) {
+				case 'power':
+					setInterval(function () { update_led_power(); }, 1000);
+					if(!powerButton) {
+						result += "<div class='control-button' onclick=button_action('" + value + "')>" + value + "</div>";
+					}
+					break;
+				case 'hdd':
+					setInterval(function () { update_led_hdd(); }, 1000);
+					break;
+			}
+		}
 	}
 	return(result);
 }
@@ -126,6 +168,9 @@ function update_resources(data) {
 	relays = make_list('Relays', data.relay);
 	rpms = make_list('Coolers', data.rpm);
 	temperature = make_list('Temperature', data.temperature);
+	if(temperature != '') {
+		document.getElementById('temperature-table').style.display = 'block';
+	}
 	Htable = "<table>" +
 		"<tr><td>Serial</td><td>" + data.serialNumber + "</td></tr>" +
 		"<tr><td>Version</td><td>" + data.version + "</td></tr>" +
@@ -139,7 +184,7 @@ function update_resources(data) {
 		temperature +
 		"</table>";
 	document.getElementById('configuration-table').innerHTML = Htable;
-	document.getElementById('menu-control').innerHTML = make_buttons(data.button);
+	document.getElementById('menu-control').innerHTML = make_buttons(data.button, data.led);
 }
 
 function update_page() {

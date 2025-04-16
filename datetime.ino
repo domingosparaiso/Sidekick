@@ -3,11 +3,12 @@
 #include <ESPDateTime.h>
 
 void datetime_init() {
-  char* ntpservers[] = { NTPSERVERS };
+  String ntpservers[] = { NTPSERVERS };
+  char ntpserver[128] = "";
   bool ntp_ok = false;
-  int count_ntps = (sizeof(ntpservers)/sizeof(char *));
+  int count_ntps = (sizeof(ntpservers)/sizeof(ntpservers[0]));
   int i = 0;
-  if(wifi_mode == WIFI_AP) {
+  if(wifi_mode == WIFI_MODE_AP) {
     console_log("Can't get datetime in AP Mode\n");
     return;
   }
@@ -17,7 +18,8 @@ void datetime_init() {
     DateTime.setTimeZone(TIMEZONE);
     console_log("\nNTP server: ");
     console_log(ntpservers[i]);
-    DateTime.setServer(ntpservers[i]);
+    ntpservers[i].toCharArray(ntpserver, 128);
+    DateTime.setServer(ntpserver);
     DateTime.begin();
     if (DateTime.isTimeValid()) {
       console_log(" [OK]");

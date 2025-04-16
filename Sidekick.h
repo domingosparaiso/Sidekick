@@ -61,8 +61,8 @@
 #define FLASH 2
 #define INIT 3
 
-#define WIFI_CLI 0
-#define WIFI_AP 1
+#define WIFI_MODE_CLI 0
+#define WIFI_MODE_AP 1
 #define TIME_WAIT_WIFI 100
 #define RECONNECT_CLI 3
 #define TIMEOUT_CHECK_WIFI 60000

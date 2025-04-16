@@ -34,4 +34,6 @@ struct rpm_data {
   long rpm;
 };
 
+union config_union CFG;
+
 // <EOF>

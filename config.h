@@ -1,7 +1,7 @@
 #pragma once
 // --- button.ino ----------------------------------------------------------------
 // * Desktop buttons configuration
-#define BUTTON_POWER_PIN 3
+//#define BUTTON_POWER_PIN 3
 //#define BUTTON_RESET_PIN 2
 //#define BUTTON_RECONFIGURE_PIN 3
 // * Value when read a pressed button (LOW=PULLUP, hIGH=PULLDOWN)
@@ -12,7 +12,7 @@
 
 // --- led.ino -------------------------------------------------------------------
 // Read LED status from motherboard
-//#define LED_POWER_PIN 4
+#define LED_POWER_PIN 3
 //#define LED_HDD_PIN 5
 // -------------------------------------------------------------------------------
 

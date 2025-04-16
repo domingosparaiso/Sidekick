@@ -1,18 +1,17 @@
 #include <EEPROM.h>
 #include <FS.h>
-#include <SPIFFS.h>
+#include <LittleFS.h>
 #include "Sidekick.h"
-#include "data.h"
+#include "storage.h"
 
 String resourcesStart = "";
 int SIZE_config_data;
-union config_union CFG;
 
 // Initialize the SPIFFS in flas memory, if we has no SPIFFS yet, format it!
 void storage_init() {
-  if(!SPIFFS.begin(true)){
+  if(!LittleFS.begin()){
     console_log("Formating storage...");
-    SPIFFS.format();
+    LittleFS.format();
     console_log(" [OK]\n");
   }
   console_log("Init storage device... [OK]\n");
@@ -20,12 +19,14 @@ void storage_init() {
 
 // Save all configuration values to a file into storage
 void save_CFG() {
-  File storage = SPIFFS.open("/config.bin", "wb");
+  File storage = LittleFS.open("/config.bin", "w");
   if (storage) {
     console_log("<SAVE CONFIG>\n");
     storage.write(CFG.raw, sizeof(config_data));
   }
   storage.close();
+  LittleFS.end();
+  LittleFS.begin();
 }
 
 // Failsafe values, used when we has no configuration yet
@@ -40,9 +41,10 @@ void set_failsafe_CFG() {
 void load_CFG() {
   console_log("Load configuration...");
   activity(FLASH);
-  File storage = SPIFFS.open("/config.bin", "rb");
+  File storage = LittleFS.open("/config.bin", "r");
   if (storage) {
     uint32_t nBytes = storage.readBytes((char*)CFG.raw, sizeof(config_data));
+    console_log(" (load) ");
   } else {
     console_log(" (failsafe mode)...");
     set_failsafe_CFG();
@@ -55,7 +57,7 @@ void load_CFG() {
 
 // Retrieve a file contents
 String getFile(String filename) {
-  File storage = SPIFFS.open(filename, "r");
+  File storage = LittleFS.open(filename, "r");
   String contents = "";
   while (storage.available()){
     contents += char(storage.read());

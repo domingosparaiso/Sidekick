@@ -1,7 +1,14 @@
-#include <Update.h>
+#ifdef ESP32
+  #include <Update.h>
+#endif
+#ifdef ESP8266
+  #include <WiFiClient.h>
+#endif
+#include <LittleFS.h>
 #include "Sidekick.h"
 #include "wificonfig.h"
 #include "html.h"
+#include "storage.h"
 
 uint8_t otaDone = 0;
 File uploadFile;
@@ -10,7 +17,7 @@ long timeout_reboot = 0;
 void handleUpdateEnd() {
   server.sendHeader("Connection", "close");
   if (Update.hasError()) {
-    server.send(502, "text/plain", Update.errorString());
+    server.send(502, "text/plain", "Update Error.");
   } else {
     server.sendHeader("Refresh", "10");
     server.sendHeader("Location", "/");
@@ -20,7 +27,7 @@ void handleUpdateEnd() {
 }
 
 void handleUpdate() {
-  size_t fsize = UPDATE_SIZE_UNKNOWN;
+  size_t fsize = 0;
   if (server.hasArg("size")) {
     fsize = server.arg("size").toInt();
   }
@@ -126,7 +133,7 @@ void handleFileUpload() {
     if (!filename.startsWith("/")) { filename = "/" + filename; }
     //uploadFile = fileSystem->open(filename, "w");
     if(filename == "/config.ini") return;
-    uploadFile = SPIFFS.open((String("/") + upload.filename).c_str(), FILE_WRITE); 
+    uploadFile = LittleFS.open((String("/") + upload.filename).c_str(), "w"); 
     if (!uploadFile) {
       return;
     }
@@ -193,7 +200,7 @@ void configServerInit() {
     }
   );
 
-  // Delete files from SPIFFS storage
+  // Delete files from storage
   server.on("/delete", []() {
     for (uint8_t i = 0; i < server.args(); i++) {
       if(String(server.argName(i)) == "arq") {
@@ -202,18 +209,18 @@ void configServerInit() {
           fname = "/" + fname;
         }
         if(fname != "/config.ini") {
-          SPIFFS.remove(fname);
+          LittleFS.remove(fname);
         }
       }
     }
     server.send(200, "text/plain", "");
   });
 
-  // SPIFFS format
+  // storage format
   server.on("/format", []() {
     display_status(STATUS_FORMAT_FS);
     console_log("<STORAGE FORMAT>");
-    if(SPIFFS.format()) {
+    if(LittleFS.format()) {
       server.send(200, "text/html", "<html><body>Flash storage formated.<hr><a href=/home>Home</a></body></html>");
       display_status(STATUS_FORMAT_OK);
     } else {
@@ -225,14 +232,14 @@ void configServerInit() {
   // Storage file management
   server.on("/fs", []() {
     String fsIndex = String(fileHtml);
-    File root = SPIFFS.open("/");
-    File file = root.openNextFile();
+    Dir root = LittleFS.openDir("/");
     String result = "<table>";
-    while (file) {
-      if(String(file.name()) != "config.ini") {
-        result += String("<tr><td class='fdel' onclick='fdel(\"" + String(file.name()) + "\")'>[del]</td><td>") + String(file.name()) + String("</td><td>") + String(file.size()) + String("</td></tr>");
+    while (root.next()) {
+      File file = root.openFile("r");
+      if(String(root.fileName()) != "config.ini") {
+        result += String("<tr><td class='fdel' onclick='fdel(\"" + String(root.fileName()) + "\")'>[del]</td><td>") + String(root.fileName()) + String("</td><td>") + String(file.size()) + String("</td></tr>");
       }
-      file = root.openNextFile();
+      file.close();
     }
     result += "</table></body></html>";
     server.send(200, "text/html", fsIndex + result);
@@ -245,14 +252,14 @@ void configServerInit() {
     }
     , handleFileUpload);
 
-  // Retrieve files stored into SPIFFS
-  server.serveStatic("/", SPIFFS, "/");
+  // Retrieve files from storage
+  server.serveStatic("/", LittleFS, "/");
 
   // url not found, open index.html instead send a 404 error, if index.html doesn't exists, send a message to upload one
   server.onNotFound([]() {
     String indexHtmlFS = "<html><body><h1>File 'index.html' not found.</h1><hr><a href=/fs>Upload Files</a></body></html>";
-    if(SPIFFS.exists("/index.html")) {
-      File storage = SPIFFS.open("/index.html", "r");
+    if(LittleFS.exists("/index.html")) {
+      File storage = LittleFS.open("/index.html", "r");
       if(storage) {
         indexHtmlFS = storage.readString();
         storage.close();
