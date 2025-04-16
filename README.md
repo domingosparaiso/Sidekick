@@ -33,6 +33,6 @@ After first boot the web page will inform you that there is no 'index.html' file
 
 I'm testing on ESP32 WROOM (30 pin model) and ESP-01 (ESP8266) with one relay board.
 
-Um esquema completo de conexões usando o ESP32.
+A complete connection diagram using ESP32.
 
-![Esquema com ESP32]https://github.com/domingosparaiso/Sidekick/blob/main/doc/Esquema.jpg
+![Esquema com ESP32](https://github.com/domingosparaiso/Sidekick/blob/main/doc/Esquema.jpg)
