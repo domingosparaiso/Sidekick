@@ -1,6 +1,7 @@
 updatehw = 0;
 updatepg = 0;
 timeoutb = 0;
+led_power = 'OFF';
 
 function show_hide_main_menu(){
 	topmenu = document.getElementById('top-menu');
@@ -66,6 +67,7 @@ function update_fields(data) {
 		value = data[key];
 		document.getElementById(key).value = value;
 	}
+	document.getElementById('sysname').innerHTML = 'Machine: ' + data['serverName'];
 	document.getElementById('CLI_DHCP1').checked=(data.CLI_DHCP=='dhcp');
 	document.getElementById('CLI_DHCP2').checked=(data.CLI_DHCP=='fixo');
 	disable_addr(data.CLI_DHCP=='dhcp');
@@ -92,7 +94,13 @@ function update_fields(data) {
 }
 
 function button_action(button_name) {
-	fetch('/button/' + button_name);
+	if(button_name == 'power') {
+		cmd = 'POWER_ON';
+		if(led_power == 'ON') cmd = 'POWER_OFF';
+	} else {
+		cmd = 'ON';
+	}
+	fetch('/relay/' + button_name + "?cmd=" + cmd);
 }
 
 function update_led(name) {
@@ -106,6 +114,7 @@ function update_led(name) {
 			if(el.classList.contains(delclass)) el.classList.remove(delclass);
 			el.classList.add('led_' + out);
 			el.innerHTML = out;
+			if(name == 'power') led_power = out;
 		}).catch(err => console.error(err));
 }
 
@@ -124,7 +133,7 @@ function make_buttons(data_buttons, data_leds) {
 		for(i = 0; i < data_buttons.length; i++) {
 			value = data_buttons[i];
 			if(value == 'power') powerButton = true;
-			result += "<div class='control-button' onclick=button_action('" + value + "')>" + value + "</div>";
+			result += "<div class='control-button' onclick=button_action('" + value + "')><img src='power.png' width=50px height=50px></div>";
 		}
 	}
 	if(data_leds != undefined) {
@@ -135,7 +144,7 @@ function make_buttons(data_buttons, data_leds) {
 				case 'power':
 					setInterval(function () { update_led_power(); }, 1000);
 					if(!powerButton) {
-						result += "<div class='control-button' onclick=button_action('" + value + "')>" + value + "</div>";
+						result += "<div class='control-button' onclick=button_action('" + value + "')><img src='power.png' width=50px height=50px></div>";
 					}
 					break;
 				case 'hdd':
@@ -184,7 +193,7 @@ function update_resources(data) {
 		temperature +
 		"</table>";
 	document.getElementById('configuration-table').innerHTML = Htable;
-	document.getElementById('menu-control').innerHTML = make_buttons(data.button, data.led);
+	document.getElementById('control-contents').innerHTML = make_buttons(data.button, data.led);
 }
 
 function update_page() {

@@ -2,12 +2,14 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
 <script src="scripts.js"></script>
 </head>
 <body>
 <div id='bodydiv'>
-<img src='/logo.png' onclick='show_hide_main_menu();'>
+<img src='/logo.jpg' onclick='show_hide_main_menu();'>
+<div class='sysname' id='sysname'></div>
 <div id='top-menu'>
 	<div class=menu>
 		<div class=item-main-menu onclick="show('menu-control','main');">
@@ -30,6 +32,7 @@
 <form method='POST' action='/setup' target='formnull'>
 
 <div class='contents upper-menu' id='menu-control'>
+<div class='control-contents' id='control-contents'></div>
 </div>
 
 <div class='contents upper-menu' id='menu-setup'>

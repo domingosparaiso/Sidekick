@@ -64,18 +64,18 @@ void relay_check() {
     in_relay_check = true;
     long now = millis();
     #ifdef RELAY_POWER_PIN
-      if(relay_power_timeout > 0 && relay_power_timeout > now) {
+      if(relay_power_timeout > 0 && relay_power_timeout < now) {
         relay_power_timeout = 0;
         digitalWrite(RELAY_POWER_PIN, (RELAY_POWER_LEVEL_ON==HIGH)?LOW:HIGH);
       }
       #ifdef BUTTON_RESET_PIN
         #ifndef RELAY_RESET_PIN
-          if(relay_power_off_timeout > 0 && relay_power_off_timeout > now) {
+          if(relay_power_off_timeout > 0 && relay_power_off_timeout < now) {
             relay_power_off_timeout = 0;
             digitalWrite(RELAY_POWER_PIN, (RELAY_POWER_LEVEL_ON==HIGH)?LOW:HIGH);
             relay_power_on_timeout = now + TIMEOUT_RESET_INTERVAL;
           }
-          if(relay_power_on_timeout > 0 && relay_power_on_timeout > now) {
+          if(relay_power_on_timeout > 0 && relay_power_on_timeout < now) {
             relay_power_on_timeout = 0;
             digitalWrite(RELAY_POWER_PIN, RELAY_POWER_LEVEL_ON);
             relay_power_timeout = now + TIMEOUT_RELAY_ON;
@@ -84,14 +84,14 @@ void relay_check() {
       #endif
     #endif
     #ifdef RELAY_RESET_PIN
-      if(relay_reset_timeout > 0 && relay_reset_timeout > now) {
+      if(relay_reset_timeout > 0 && relay_reset_timeout < now) {
         relay_reset_timeout = 0;
         digitalWrite(RELAY_RESET_PIN, (RELAY_RESET_LEVEL_ON==HIGH)?LOW:HIGH);
       }
     #endif
     #ifdef RELAY_BACK_PIN
       // turn off backligth on timeout
-      if(relay_backligth_timeout > 0 && relay_backligth_timeout > now) {
+      if(relay_backligth_timeout > 0 && relay_backligth_timeout < now) {
         relay_backligth_timeout = 0;
         digitalWrite(RELAY_BACK_PIN, (RELAY_BACK_LEVEL_ON==HIGH)?LOW:HIGH);
       }
@@ -125,6 +125,7 @@ int cmdString2Int(int relay_port, String cmd) {
 void relay_set(int relay_port, int value) {
   int level_on;
   int level_off;
+  String result = "Error";
 
   if(value != ERROR_VALUE) {
     switch(relay_port) {
@@ -178,22 +179,21 @@ void relay_set(int relay_port, int value) {
           if(relay_port == RELAY_BACK_PIN) relay_backligth_timeout = millis() + BACKLIGHT_TIMEOUT;
         #endif
         break;
-      #ifdef RELAY_POWER_PIN
-        case RELAY_POWER_OFF:
-          digitalWrite(RELAY_POWER_PIN, RELAY_POWER_LEVEL_ON);
-          relay_power_timeout = millis() + TIMEOUT_RELAY_OFF;
-          break;
-        case RELAY_POWER_ON:
-          digitalWrite(RELAY_POWER_PIN, RELAY_POWER_LEVEL_ON);
-          relay_power_timeout = millis() + TIMEOUT_RELAY_ON;
-          break;
-        #ifdef BUTTON_RESET_PIN
-          #ifndef RELAY_RESET_PIN
-            case RELAY_POWER_OFF_ON:
-              digitalWrite(RELAY_POWER_PIN, RELAY_POWER_LEVEL_ON);
-              relay_power_off_timeout = millis() + TIMEOUT_RELAY_OFF;
-              break;
-          #endif
+      case RELAY_POWER_OFF:
+        digitalWrite(relay_port, level_on);
+        relay_power_timeout = millis() + TIMEOUT_RELAY_OFF;
+        break;
+      case RELAY_POWER_ON:
+        digitalWrite(relay_port, level_on);
+        relay_power_timeout = millis() + TIMEOUT_RELAY_ON;
+        result = String(relay_port) + ":" + String(level_on) + ":" + String(relay_power_timeout);
+        break;
+      #ifdef BUTTON_RESET_PIN
+        #ifndef RELAY_RESET_PIN
+          case RELAY_POWER_OFF_ON:
+            digitalWrite(relay_port, level_on);
+            relay_power_off_timeout = millis() + TIMEOUT_RELAY_OFF;
+            break;
         #endif
       #endif
       #ifdef RELAY_RESET_PIN
@@ -203,10 +203,9 @@ void relay_set(int relay_port, int value) {
           break;
       #endif
     }
-    send_result_json("OK");
-  } else {
-    send_result_json("Error");
+    result = "OK";
   }
+  send_result_json(result);
 }
 
 void relay_register() {
@@ -228,6 +227,8 @@ void relay_register() {
   #ifdef RELAY_SYS4_PIN
     server.on("/relay/sys4", HTTP_GET, []() { relay_set(RELAY_SYS4_PIN, cmdString2Int(RELAY_SYS4_PIN, server.arg("cmd"))); });
   #endif
+  server.on("/relay/LOW", HTTP_GET, []() { digitalWrite(0,LOW); server.send(200, "plain/text", "LOW"); });
+  server.on("/relay/HIGH", HTTP_GET, []() { digitalWrite(0,HIGH); server.send(200, "plain/text", "HIGH"); });
   #ifdef RELAY_BACK_PIN
     server.on("/backlight/off", HTTP_GET, []() { relay_set(RELAY_BACK_PIN, RELAY_OFF); });
     server.on("/backlight/on", HTTP_GET, []() { relay_set(RELAY_BACK_PIN, RELAY_ON); });

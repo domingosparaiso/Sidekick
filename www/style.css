@@ -3,6 +3,15 @@
 	font-size: 20;
 }
 
+.sysname {
+	color: black;
+	font-size: 30px;
+}
+
+.control-contents {
+	display: flex;
+}
+
 #top-menu {
 	display: none;
 }
@@ -46,26 +55,20 @@
 
 .control-button {
 	padding: 15px;
-	font-size: 30px;
-	color: white;
 	text-align: center;
 	border: auto;
-	background-color: green;
 	cursor: pointer;
-	border-color: #40FF40;
-	border-style: solid;
-	border-width: 5px;
 	width: 100px;
 	height: 50px;
 }
 
 .control-led {
+	border-radius: 50px;
 	padding: 15px;
 	font-size: 30px;
 	text-align: center;
 	color: white;
 	border: auto;
-	border-color: #40FF40;
 	border-style: solid;
 	border-width: 5px;
 	width: 100px;
@@ -74,8 +77,10 @@
 
 .led_ON {
 	background-color: green;
+	border-color: #40FF40;
 }
 
 .led_OFF {
 	background-color: red;
+	border-color: #FF4040;
 }
