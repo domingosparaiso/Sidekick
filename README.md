@@ -35,9 +35,9 @@ I'm testing on ESP32 WROOM (30 pin model) and ESP-01 (ESP8266) with one relay bo
 
 A complete connection diagram using ESP32 with all possible connections.
 
-![Connection diagram using ESP32](https://github.com/domingosparaiso/Sidekick/blob/main/doc/ESP32.jpg)
+![Connection diagram using ESP32](https://github.com/domingosparaiso/Sidekick/doc/ESP32.jpg)
 
 This software can be used on a ESP8266 too, I use on a ESP-01 with one relay board adapter.
 The ATX power supply used by any PC can supply 5V even when the computer was turned off, obviously they need to be connected by power cord. Just need to get the +5V at 5VSB (SB=Stand By) pin 9 and any ground pin (I use pin 7). Just one hack was needed, solder a cable at GPIO3 pin to read Power LED signal, I solded at bottom face of the relay board adapter.
 
-![Connection diagram using ESP32](https://github.com/domingosparaiso/Sidekick/blob/main/doc/ESP8266.jpg)
+![Connection diagram using ESP32](https://github.com/domingosparaiso/Sidekick/doc/ESP8266.jpg)
