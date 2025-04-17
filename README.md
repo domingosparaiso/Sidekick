@@ -29,10 +29,15 @@ When you setup your ESP for the first time, you don't have a setup stored at the
 
 The last configuration you can do is the date and time settings, you can set the timezone (see the 'config.h' file to find the url to valids timezone informations), you can set the NTP server list (the software will try one by one until get the date and time), and the date and time format used to display.
 
-After first boot the web page will inform you that there is no 'index.html' file and place a link to file manager, you need to upload the files from 'www' directory. When you finnish, the main page can be acessed and the setup toolbar will be activated by click at the logo on top. Now you can set your wifi network information (SSID and password), the IP can be fixed or via dhcp (in this case you can see the assigned IP at the display). You can set the AP mode SSID and password to be used when you enter in the AP mode insted the default ones, the AP mode will be activated by pressing the configuration button or if the ESP can't connect to your wifi network tree times in a row. The AP mode is just needed to change the client wifi network SSID and password.
+After first boot the system can't reach any WiFi network, coz they don't configured yet, so they enter in a failsafe mode creating a new SSID, acting like an AP (Access Point), the failsafe SSID and password can be defined at 'config.h' file. The default network address when in failsafe mode is 192.168.100.1, just open a web page at this addres and they will inform you that there is no 'index.html' file and place a link to file manager, you need to upload the files from 'www' directory. When you finnish, the main page can be acessed and the setup toolbar will be activated by click at the logo on top. Now you can set your wifi network information (SSID and password), the IP can be fixed or via dhcp (in this case you can see the assigned IP at the display). You can set the AP mode SSID and password to be used when you enter in the AP mode insted the default ones, the AP mode (fail safe) will be activated by pressing the configuration button or if the ESP can't connect to your wifi network tree times in a row. The AP mode is just needed to change the client wifi network SSID and password. Reboot the device by configuration menu and they will connect to your configured WiFi network.
 
 I'm testing on ESP32 WROOM (30 pin model) and ESP-01 (ESP8266) with one relay board.
 
-A complete connection diagram using ESP32.
+A complete connection diagram using ESP32 with all possible connections.
 
-![Connection diagram using ESP32](https://github.com/domingosparaiso/Sidekick/blob/main/doc/Esquema.jpg)
+![Connection diagram using ESP32](https://github.com/domingosparaiso/Sidekick/blob/main/doc/ESP32.jpg)
+
+This software can be used on a ESP8266 too, I use on a ESP-01 with one relay board adapter.
+The ATX power supply used by any PC can supply 5V even when the computer was turned off, obviously they need to be connected by power cord. Just need to get the +5V at 5VSB (SB=Stand By) pin 9 and any ground pin (I use pin 7). Just one hack was needed, solder a cable at GPIO3 pin to read Power LED signal, I solded at bottom face of the relay board adapter.
+
+![Connection diagram using ESP32](https://github.com/domingosparaiso/Sidekick/blob/main/doc/ESP8266.jpg)
