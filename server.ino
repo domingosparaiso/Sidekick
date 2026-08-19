@@ -221,10 +221,10 @@ void configServerInit() {
     display_status(STATUS_FORMAT_FS);
     console_log("<STORAGE FORMAT>");
     if(LittleFS.format()) {
-      server.send(200, "text/html", "<html><body>Flash storage formated.<hr><a href=/home>Home</a></body></html>");
+      server.send(200, "text/html", "<html><head><link rel='stylesheet' href='style.css'></head><body>Flash storage formated.<hr><a href=/home>Home</a></body></html>");
       display_status(STATUS_FORMAT_OK);
     } else {
-      server.send(200, "text/html", "<html><body>Error at Flash storage format.<hr><a href=/home>Home</a></body></html>");
+      server.send(200, "text/html", "<html><head><link rel='stylesheet' href='style.css'></head><body>Error at Flash storage format.<hr><a href=/home>Home</a></body></html>");
       display_status(STATUS_FORMAT_ERROR);
     }
   });
@@ -232,16 +232,32 @@ void configServerInit() {
   // Storage file management
   server.on("/fs", []() {
     String fsIndex = String(fileHtml);
-    Dir root = LittleFS.openDir("/");
     String result = "<table>";
-    while (root.next()) {
-      File file = root.openFile("r");
-      if(String(root.fileName()) != "config.ini") {
-        result += String("<tr><td class='fdel' onclick='fdel(\"" + String(root.fileName()) + "\")'>[del]</td><td>") + String(root.fileName()) + String("</td><td>") + String(file.size()) + String("</td></tr>");
+    #ifdef ESP8266
+      Dir root = LittleFS.openDir("/");
+      while (root.next()) {
+        File file = root.openFile("r");
+        if(String(root.fileName()) != "config.ini") {
+          result += String("<tr><td class='fdel' onclick='fdel(\"" + String(root.fileName()) + "\")'>[del]</td><td>") + String(root.fileName()) + String("</td><td>") + String(file.size()) + String("</td></tr>");
+        }
+        file.close();
       }
-      file.close();
-    }
-    result += "</table></body></html>";
+    #endif
+    #ifdef ESP32
+      File root = LittleFS.open("/");
+      if (!root || !root.isDirectory()) {
+        result += "<tr><td>Not found</td></tr>";
+      } else {
+        File file = root.openNextFile();
+        while (file) {
+          if(String(file.name()) != "config.ini") {
+            result += String("<tr><td class='fdel' onclick='fdel(\"" + String(file.name()) + "\")'>[del]</td><td>") + String(file.name()) + String("</td><td>") + String(file.size()) + String("</td></tr>");
+          }
+          file = root.openNextFile();
+        }
+      }
+    #endif
+    result += "</table></div></body></html>";
     server.send(200, "text/html", fsIndex + result);
   });
 

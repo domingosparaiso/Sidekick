@@ -8,7 +8,7 @@
 </head>
 <body>
 <div id='bodydiv'>
-<img src='/logo.jpg' onclick='show_hide_main_menu();'>
+<img src='logo.jpg' onclick='show_hide_main_menu();'>
 <div class='sysname' id='sysname'></div>
 <div id='top-menu'>
 	<div class=menu>
@@ -46,13 +46,12 @@
 			Server
 		</div>
 		<div class=separator></div>
-		<div class=group>Wifi
-			<div class=item-auxiliary-menu onclick="show('tab-wifi-cli','');">
-				Client
-			</div>
-			<div class=item-auxiliary-menu onclick="show('tab-wifi-ap','');">
-				Access Point
-			</div>
+		<div class=item-auxiliary-menu onclick="show('tab-wifi-cli','');">
+			Wifi Client
+		</div>
+		<div class=separator></div>
+		<div class=item-auxiliary-menu onclick="show('tab-wifi-ap','');">
+			Access Point
 		</div>
 		<div class=separator></div>
 		<div class=item-auxiliary-menu onclick="show('tab-hardware','');">
@@ -60,7 +59,7 @@
 		</div>
 		<div class=separator></div>
 		<div class=item-auxiliary-menu>
-			<input type=submit value=' Save configuration '><iframe id="formnull" name="formnull" style="height:20px;width:300px;border:none;"></iframe>
+			<input type=submit value=' Save configuration '><iframe id="formnull" name="formnull" style="padding-left:1em;height:20px;width:300px;border:none;color:white;"></iframe>
 		</div>
 	</div>
 </div>

@@ -133,7 +133,7 @@ function make_buttons(data_buttons, data_leds) {
 		for(i = 0; i < data_buttons.length; i++) {
 			value = data_buttons[i];
 			if(value == 'power') powerButton = true;
-			result += "<div class='control-button' onclick=button_action('" + value + "')><img src='power.png' width=50px height=50px></div>";
+			result += "<div class='control-button' onclick=button_action('" + value + "')><img src='power.png' width=32 height=32></div>";
 		}
 	}
 	if(data_leds != undefined) {

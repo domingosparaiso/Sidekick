@@ -55,15 +55,8 @@ void button_init() {
 // check if power button was pressed
 #ifdef BUTTON_POWER_PIN
   bool button_power() {    
-    if(digitalRead(BUTTON_POWER_PIN) == VALUE_BUTTON_POWER) {
-      if(!last_status_button_power) {
-        last_status_button_power = true;
-        return true;
-      }
-    } else {
-      last_status_button_power = false;
-    }
-    return false;
+    last_status_button_power = (digitalRead(BUTTON_POWER_PIN) == VALUE_BUTTON_POWER && !last_status_button_power);
+    return last_status_button_power;
   }
 #endif
 

@@ -81,12 +81,12 @@ void setup() {
   // [data.ino] Load storage configuration
   load_CFG();
 
-  // [button.ino] Initialize button configuration
-  button_init();
-  
   // [led.ino] Initialize read LED configuration
   led_init();
 
+  // [button.ino] Initialize button configuration
+  button_init();
+  
   // [relay.ino] Initialize relay configuration
   relay_init();
 

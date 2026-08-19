@@ -33,6 +33,8 @@ After first boot the system can't reach any WiFi network, coz they don't configu
 
 I'm testing on ESP32 WROOM (30 pin model) and ESP-01 (ESP8266) with one relay board.
 
+Install libraries: ESPDateTime, DS18B20, OneWire, LittleFS_esp32
+
 A complete connection diagram using ESP32 with all possible connections.
 
 ![Connection diagram using ESP32](https://github.com/domingosparaiso/Sidekick/blob/main/doc/ESP32.png)

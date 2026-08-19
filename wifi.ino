@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef ESP32
   #include <WiFi.h>
   #include <WiFiAP.h>
@@ -18,7 +20,7 @@ long next_check_wifi = 0;
 void connect_wifi() {
   next_check_wifi = millis() + TIMEOUT_CHECK_WIFI;
   int retry_connect = RECONNECT_CLI;
-  while(wifi_mode == WIFI_MODE_CLI && --retry_connect >= 0 && !connect_wifi_cli());
+  while(wifi_mode == WIFI_STA && --retry_connect >= 0 && !connect_wifi_cli());
   if(WiFi.status() != WL_CONNECTED) connect_wifi_ap();
 }
 
@@ -27,7 +29,7 @@ bool connect_wifi_cli() {
   int status_wifi = STATUS_CONFIG_WIFI_1;
   // If no SSID configured into storage, exit and try the AP mode
   if(strlen(CFG.data.CLI.wifi.SSID)==0) {
-    wifi_mode = WIFI_MODE_AP;
+    wifi_mode = WIFI_AP;
     return(false);
   }
 
@@ -89,7 +91,7 @@ void connect_wifi_ap() {
   WiFi.softAPConfig(ip, gateway, subnet);
   display_print(1, 1, CFG.data.AP.SSID);
   display_print(2, 1, CFG.data.AP.password);
-  wifi_mode = WIFI_MODE_AP;
+  wifi_mode = WIFI_AP;
   IPAddress myIP = WiFi.softAPIP();
   console_log(String("\nConnected: [") + myIP.toString() + String("]... [OK]\n"));
   display_print(1, 1, F("WiFi AP"));
