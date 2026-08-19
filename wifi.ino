@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SIDEWIFI
+#define SIDEWIFI
 
 #ifdef ESP32
   #include <WiFi.h>
@@ -109,3 +110,5 @@ void check_wifi() {
     block_loop = false;
   }
 }
+
+#endif

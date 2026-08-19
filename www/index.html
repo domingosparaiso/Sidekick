@@ -41,25 +41,21 @@
 		<div class=item-auxiliary-menu onclick="show('tab-configuration','');">
 			Configuration
 		</div>
-		<div class=separator></div>
 		<div class=item-auxiliary-menu onclick="show('tab-server','');">
 			Server
 		</div>
-		<div class=separator></div>
 		<div class=item-auxiliary-menu onclick="show('tab-wifi-cli','');">
 			Wifi Client
 		</div>
-		<div class=separator></div>
 		<div class=item-auxiliary-menu onclick="show('tab-wifi-ap','');">
 			Access Point
 		</div>
-		<div class=separator></div>
 		<div class=item-auxiliary-menu onclick="show('tab-hardware','');">
 			Hardware
 		</div>
-		<div class=separator></div>
 		<div class=item-auxiliary-menu>
-			<input type=submit value=' Save configuration '><iframe id="formnull" name="formnull" style="padding-left:1em;height:20px;width:300px;border:none;color:white;"></iframe>
+			<input type=submit value=' Save configuration '>
+			<iframe id="formnull" name="formnull" style="display:none;"></iframe>
 		</div>
 	</div>
 </div>
@@ -73,9 +69,7 @@
 <div class='contents tab-menu' id='tab-server'>
 <div class=title>Server Identification</div>
 <table>
-<tr><td colspan=2>Provide server name</tr></td>
-<tr><td>Server</td><td><input name='serverName' id='serverName' size=32></td></tr>
-<tr><td colspan=2>Password used to reconfigure</tr></td>
+<tr><td>Server name</td><td><input name='serverName' id='serverName' type=text size=32></td></tr>
 <tr><td>Password</td><td><input name='password' id='password' type=text size=20></td></tr>
 </table>
 </div>
@@ -85,7 +79,7 @@
 <table>
 <tr><td>SSID</td><td><input name='CLI_wifi_SSID' id='CLI_wifi_SSID' type=text size=32></td></tr>
 <tr><td>Password</td><td><input name='CLI_wifi_password' id='CLI_wifi_password' type=text size=32></td></tr>
-<tr><td colspan=2>TCP/IP: 
+<tr><td>TCP/IP</td><td>
 <input type='radio' name='CLI_DHCP' id='CLI_DHCP1' value='dhcp' checked onclick='disable_addr(true);'>
 <label for='CLI_DHCP1'>DHCP</label>
 <input type='radio' name='CLI_DHCP' id='CLI_DHCP2' value='fixed' onclick='disable_addr(false);'>
@@ -128,6 +122,9 @@
 
 <div class='contents tab-menu' id='tab-hardware'>
 <div class=title>Hardware</div>
+<div id='no-hardware'>
+No hardware configuration.
+</div>
 <div id='temperature-table' style='display: none'>
 <table>
 <td><td colspan=2>Temperature sensors</td></tr>

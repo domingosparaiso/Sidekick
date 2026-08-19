@@ -89,9 +89,13 @@ const char *fileHtml = R"literal(
 const button = document.getElementById('fileup');
 const fname = document.getElementById('fname');
 button.addEventListener('change', () => {
+  list = '';
+  sep = '';
   for (const file of button.files) {
-    fname.innerHTML = file.name + ' (' + file.size + ')';
+    list += sep + file.name + ' (' + file.size + ')';
+    sep = ', ';
   }
+  fname.innerHTML = list;
 });
 const form = document.querySelector('form');
 form.addEventListener('submit', handleSubmit);

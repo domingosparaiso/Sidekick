@@ -1,8 +1,8 @@
 #include "Sidekick.h"
 #include "wificonfig.h"
-#include <DS18B20.h>
 
 #ifdef TEMP_WIRE_PIN
+#include <DS18B20.h>
   DS18B20 ds(TEMP_WIRE_PIN);
   // Temperature DS18B20 sensors
   // array of 1wire address discovered in bus

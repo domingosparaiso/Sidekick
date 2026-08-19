@@ -33,7 +33,7 @@
 
 // --- relay.ino -----------------------------------------------------------------
 // Relay power connected at power button place on the motherboard
-#define RELAY_POWER_PIN 2
+#define RELAY_POWER_PIN 0
 #define RELAY_POWER_LEVEL_ON LOW
 // Relay power connected at reset button place on the motherboard
 //#define RELAY_RESET_PIN 9

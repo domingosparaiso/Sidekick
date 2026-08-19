@@ -178,6 +178,7 @@ function update_resources(data) {
 	rpms = make_list('Coolers', data.rpm);
 	temperature = make_list('Temperature', data.temperature);
 	if(temperature != '') {
+		document.getElementById('no-hardware').style.display = 'none';
 		document.getElementById('temperature-table').style.display = 'block';
 	}
 	Htable = "<table>" +
