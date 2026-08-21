@@ -154,7 +154,7 @@ void handleFileUpload() {
     // Make sure paths always start with "/"
     if (!filename.startsWith("/")) { filename = "/" + filename; }
     //uploadFile = fileSystem->open(filename, "w");
-    if(filename == "/config.ini") return;
+    if(filename == "/config.bin") return;
     uploadFile = LittleFS.open((String("/") + upload.filename).c_str(), "w"); 
     if (!uploadFile) {
       return;
@@ -242,7 +242,7 @@ void configServerInit() {
         if(!fname.startsWith("/")) {
           fname = "/" + fname;
         }
-        if(fname != "/config.ini") {
+        if(fname != "/config.bin") {
           LittleFS.remove(fname);
         }
       }
@@ -271,7 +271,7 @@ void configServerInit() {
       Dir root = LittleFS.openDir("/");
       while (root.next()) {
         File file = root.openFile("r");
-        if(String(root.fileName()) != "config.ini") {
+        if(String(root.fileName()) != "config.bin") {
           result += String("<tr><td class='fdel' onclick='fdel(\"" + String(root.fileName()) + "\")'>[del]</td><td>") + String(root.fileName()) + String("</td><td>") + String(file.size()) + String("</td></tr>");
         }
         file.close();
@@ -284,7 +284,7 @@ void configServerInit() {
       } else {
         File file = root.openNextFile();
         while (file) {
-          if(String(file.name()) != "config.ini") {
+          if(String(file.name()) != "config.bin") {
             result += String("<tr><td class='fdel' onclick='fdel(\"" + String(file.name()) + "\")'>[del]</td><td>") + String(file.name()) + String("</td><td>") + String(file.size()) + String("</td></tr>");
           }
           file = root.openNextFile();

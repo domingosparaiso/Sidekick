@@ -13,7 +13,7 @@ const char *uploadHtml = R"literal(
     <div class="container-box">
     <div class='labelup'>
     <label for='fileup'>Choose firmware...</label>
-    <input name='file' type='file' id='fileup' class='hide-item' name='update'>
+    <input name='file' type='file' id='fileup' class='hide-item'>
     </div>
     <div class='box' id='fname'></div>
     <div>
@@ -28,17 +28,13 @@ const char *uploadHtml = R"literal(
     </div>
   </body>
   <script>
-    var prg = document.getElementById('prg');
-    var form = document.getElementById('upload-form');
-    form.addEventListener('submit', el=>{
-      el.preventDefault();
-      submit_update();
-    }
     function submit_update() {
+      var form = document.getElementById('upload-form');
+      var prg = document.getElementById('prg');
       prg.style.backgroundColor = 'blue';
       var data = new FormData(form);
       var req = new XMLHttpRequest();
-      var fsize = document.getElementById('file').files[0].size;
+      var fsize = document.getElementById('fileup').files[0].size;
       req.open('POST', '/update?size=' + fsize);
       req.upload.addEventListener('progress', p=>{
         let w = Math.round(p.loaded/p.total*100) + '%';
@@ -49,7 +45,7 @@ const char *uploadHtml = R"literal(
           if(w == '100%') prg.style.backgroundColor = 'black';
       });
       req.send(data);
-     });
+     }
   </script>
 </body>
 </html>
