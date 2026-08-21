@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id='bodydiv' style='max-width:360px'>
+<img src='logo.jpg' style='width:100%' onerror="this.style.display='none'">
+<h2 style='margin:20px 0;color:var(--accent-cyan);text-align:center'>Login</h2>
+<form method='POST' action='/login'>
+<table>
+<tr><td>User</td><td><input name='userName' id='userName' type='text' size=20 autofocus></td></tr>
+<tr><td>Password</td><td><input name='password' id='password' type='password' size=20></td></tr>
+</table>
+<div id='error-msg' style='color:var(--danger-color);margin:15px 0;display:none'>Invalid user or password</div>
+<input type='submit' value='Enter' style='width:100%;margin-top:10px'>
+</form>
+</div>
+<script>
+if(location.search.indexOf('error=1') >= 0) {
+  document.getElementById('error-msg').style.display = 'block';
+}
+</script>
+</body>
+</html>

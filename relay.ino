@@ -1,5 +1,6 @@
 #include "Sidekick.h"
 #include "wificonfig.h"
+#include "cookie.h"
 // Relay control
 // array [ POWER, SYS#1, SYS#2, SYS#3, SYS#4 ]
 
@@ -210,28 +211,28 @@ void relay_set(int relay_port, int value) {
 
 void relay_register() {
   #ifdef RELAY_POWER_PIN
-    server.on("/relay/power", HTTP_GET, []() { relay_set(RELAY_POWER_PIN, cmdString2Int(RELAY_POWER_PIN, server.arg("cmd"))); });
+    authOn("/relay/power", HTTP_GET, []() { relay_set(RELAY_POWER_PIN, cmdString2Int(RELAY_POWER_PIN, server.arg("cmd"))); });
   #endif
   #ifdef RELAY_RESET_PIN
-    server.on("/relay/reset", HTTP_GET, []() { relay_set(RELAY_RESET_PIN, cmdString2Int(RELAY_RESET_PIN, server.arg("cmd"))); });
+    authOn("/relay/reset", HTTP_GET, []() { relay_set(RELAY_RESET_PIN, cmdString2Int(RELAY_RESET_PIN, server.arg("cmd"))); });
   #endif
   #ifdef RELAY_SYS1_PIN
-    server.on("/relay/sys1", HTTP_GET, []() { relay_set(RELAY_SYS1_PIN, cmdString2Int(RELAY_SYS1_PIN, server.arg("cmd"))); });
+    authOn("/relay/sys1", HTTP_GET, []() { relay_set(RELAY_SYS1_PIN, cmdString2Int(RELAY_SYS1_PIN, server.arg("cmd"))); });
   #endif
   #ifdef RELAY_SYS2_PIN
-    server.on("/relay/sys2", HTTP_GET, []() { relay_set(RELAY_SYS2_PIN, cmdString2Int(RELAY_SYS2_PIN, server.arg("cmd"))); });
+    authOn("/relay/sys2", HTTP_GET, []() { relay_set(RELAY_SYS2_PIN, cmdString2Int(RELAY_SYS2_PIN, server.arg("cmd"))); });
   #endif
   #ifdef RELAY_SYS3_PIN
-    server.on("/relay/sys3", HTTP_GET, []() { relay_set(RELAY_SYS3_PIN, cmdString2Int(RELAY_SYS3_PIN, server.arg("cmd"))); });
+    authOn("/relay/sys3", HTTP_GET, []() { relay_set(RELAY_SYS3_PIN, cmdString2Int(RELAY_SYS3_PIN, server.arg("cmd"))); });
   #endif
   #ifdef RELAY_SYS4_PIN
-    server.on("/relay/sys4", HTTP_GET, []() { relay_set(RELAY_SYS4_PIN, cmdString2Int(RELAY_SYS4_PIN, server.arg("cmd"))); });
+    authOn("/relay/sys4", HTTP_GET, []() { relay_set(RELAY_SYS4_PIN, cmdString2Int(RELAY_SYS4_PIN, server.arg("cmd"))); });
   #endif
-  server.on("/relay/LOW", HTTP_GET, []() { digitalWrite(0,LOW); server.send(200, "plain/text", "LOW"); });
-  server.on("/relay/HIGH", HTTP_GET, []() { digitalWrite(0,HIGH); server.send(200, "plain/text", "HIGH"); });
+  authOn("/relay/LOW", HTTP_GET, []() { digitalWrite(0,LOW); server.send(200, "plain/text", "LOW"); });
+  authOn("/relay/HIGH", HTTP_GET, []() { digitalWrite(0,HIGH); server.send(200, "plain/text", "HIGH"); });
   #ifdef RELAY_BACK_PIN
-    server.on("/backlight/off", HTTP_GET, []() { relay_set(RELAY_BACK_PIN, RELAY_OFF); });
-    server.on("/backlight/on", HTTP_GET, []() { relay_set(RELAY_BACK_PIN, RELAY_ON); });
+    authOn("/backlight/off", HTTP_GET, []() { relay_set(RELAY_BACK_PIN, RELAY_OFF); });
+    authOn("/backlight/on", HTTP_GET, []() { relay_set(RELAY_BACK_PIN, RELAY_ON); });
   #endif
 }
 

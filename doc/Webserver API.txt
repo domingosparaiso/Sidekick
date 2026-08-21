@@ -1,3 +1,7 @@
+*** All endpoints below (except /login) require a valid session cookie (mySessionID), obtained by
+*** logging in at /login with the userName/password stored in config.h. Sessions expire after 1h.
+/login -> GET: show the login page (login.html from storage, or a hardcoded fallback). POST (userName, password): validate against CFG, set the session cookie and redirect to "/"
+
 /upload -> Firmware upload page (OTA)
 /reboot -> Reboot device
 /config -> Configuration backend, receive data from form

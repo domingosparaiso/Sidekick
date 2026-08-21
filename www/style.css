@@ -56,12 +56,11 @@ img[src='logo.jpg']:hover {
 	display: none;
 }
 
-.sysname {
+.username {
 	color: var(--accent-cyan);
 	font-size: 1.5rem;
 	font-weight: 600;
 	margin: 15px 0;
-	text-transform: uppercase;
 	letter-spacing: 1px;
 }
 

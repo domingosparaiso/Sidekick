@@ -96,12 +96,18 @@
 
 // --- data.ino ------------------------------------------------------------------
 // when no config was found, the system start into a failsafe mode, using this default values
+#define DEFAULT_SSID "changeme"
+#define DEFAULT_PASS "changeme"
 // default SSID when in AP name (reconfigure mode)
 #define DEFAULT_AP_SSID "SIDEKICK_AP"
 // default password to connect into AP
 #define DEFAULT_AP_PASS "password"
-// default password used to enter configuration
-#define DEFAULT_PASSWORD "password"
+// default user to enter
+#define DEFAULT_USER "admin"
+// default password used to enter
+#define DEFAULT_PASSWORD "admin"
+// default device hostname
+#define DEFAULT_HOSTNAME "sidekick"
 // -------------------------------------------------------------------------------
 
 // --- datetime.ino --------------------------------------------------------------
@@ -112,7 +118,7 @@
 // NTP servers - list of NTP server to be used
 #define NTPSERVERS "a.st1.ntp.br", "b.st1.ntp.br", "c.st1.ntp.br", "d.st1.ntp.br"
 #define DATE_FORMAT "%d/%m/%y"
-#define TIME_FORMAT "%M:%M:%S"
+#define TIME_FORMAT "%H:%M:%S"
 // -------------------------------------------------------------------------------
 
 

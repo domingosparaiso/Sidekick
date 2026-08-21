@@ -31,10 +31,18 @@ void save_CFG() {
 
 // Failsafe values, used when we has no configuration yet
 void set_failsafe_CFG() {
-  String("sidekick").toCharArray(CFG.data.serverName,32);
+  String(DEFAULT_USER).toCharArray(CFG.data.userName,32);
   String(DEFAULT_PASSWORD).toCharArray(CFG.data.password, 32);
+  String(DEFAULT_SSID).toCharArray(CFG.data.CLI.wifi.SSID,32);
+  String(DEFAULT_PASS).toCharArray(CFG.data.CLI.wifi.password,32);
   String(DEFAULT_AP_SSID).toCharArray(CFG.data.AP.SSID,32);
   String(DEFAULT_AP_PASS).toCharArray(CFG.data.AP.password,32);
+  String(DEFAULT_HOSTNAME).toCharArray(CFG.data.hostname,32);
+  CFG.data.CLI.DHCP = 0;
+  CFG.data.CLI.IP[0]=192;CFG.data.CLI.IP[1]=168;CFG.data.CLI.IP[2]=1;CFG.data.CLI.IP[3]=50;
+  CFG.data.CLI.GW[0]=192;CFG.data.CLI.GW[1]=168;CFG.data.CLI.GW[2]=1;CFG.data.CLI.GW[3]=10;
+  CFG.data.CLI.MASK[0]=255;CFG.data.CLI.MASK[1]=255;CFG.data.CLI.MASK[2]=255;CFG.data.CLI.MASK[3]=0;
+  CFG.data.CLI.DNS[0]=8;CFG.data.CLI.DNS[1]=8;CFG.data.CLI.DNS[2]=8;CFG.data.CLI.DNS[3]=8;
 }
 
 // Read configuration file and place the values into the CFG struct
@@ -44,14 +52,14 @@ void load_CFG() {
   File storage = LittleFS.open("/config.bin", "r");
   if (storage) {
     uint32_t nBytes = storage.readBytes((char*)CFG.raw, sizeof(config_data));
-    console_log(" (load) ");
+    console_log(" (load)...");
   } else {
     console_log(" (failsafe mode)...");
     set_failsafe_CFG();
   }
   storage.close();
   activity(FLASH);
-  delay(1000);
+  delay(500);
   console_log(" [OK]\n");
 }
 

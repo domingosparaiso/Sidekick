@@ -15,12 +15,13 @@ struct wifi_client {
 };
 
 struct config_data {
-  char serverName[32];
+  char userName[32];
   char password[32];
   wifi_config AP;
   wifi_client CLI;
   uint8_t maptemp[5];
   int timeout_backlight;
+  char hostname[32];
 };
 
 union config_union {

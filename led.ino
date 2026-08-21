@@ -1,5 +1,6 @@
 #include "Sidekick.h"
 #include "wificonfig.h"
+#include "cookie.h"
 // Read LED pins from PC motherboard, used to check if the PC is on and if HDD still in use
 
 // Setup LED pins
@@ -32,12 +33,12 @@ void led_init() {
 
 void led_register() {
   #ifdef LED_POWER_PIN
-  server.on("/led/power", HTTP_GET, []() {
+  authOn("/led/power", HTTP_GET, []() {
     server.send(200, "application/json", "{ \"led_power\": \"" + String(led_power()?"ON":"OFF") + "\"}");
   });
   #endif
   #ifdef LED_HDD_PIN
-  server.on("/led/hdd", HTTP_GET, []() {
+  authOn("/led/hdd", HTTP_GET, []() {
     server.send(200, "application/json", "{ \"led_hdd\": \"" + String(led_hdd()?"ON":"OFF") + "\"}");
   });
   #endif

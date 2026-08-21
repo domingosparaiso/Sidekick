@@ -61,13 +61,13 @@ function filesystem() {
 }
 
 function update_fields(data) {
-	field_list = ['serverName','CLI_wifi_SSID','CLI_wifi_password','AP_SSID','AP_password','password', 'timeout'];
+	field_list = ['userName','hostname','CLI_wifi_SSID','CLI_wifi_password','AP_SSID','AP_password','password', 'timeout'];
 	for(i = 0; i < field_list.length; i++) {
 		key = field_list[i];
 		value = data[key];
 		document.getElementById(key).value = value;
 	}
-	document.getElementById('sysname').innerHTML = 'Machine: ' + data['serverName'];
+	document.getElementById('username').innerHTML = 'Host: ' + data['hostname'];
 	document.getElementById('CLI_DHCP1').checked=(data.CLI_DHCP=='dhcp');
 	document.getElementById('CLI_DHCP2').checked=(data.CLI_DHCP=='fixo');
 	disable_addr(data.CLI_DHCP=='dhcp');
@@ -185,7 +185,8 @@ function update_resources(data) {
 		"<tr><td>Serial</td><td>" + data.serialNumber + "</td></tr>" +
 		"<tr><td>Version</td><td>" + data.version + "</td></tr>" +
 		"<tr><td>Board</td><td>" + data.board + "</td></tr>" +
-		"<tr><td>Frquency</td><td>" + data.mhz + " Mhz</td></tr>" +
+		"<tr><td>Frequency</td><td>" + data.mhz + " Mhz</td></tr>" +
+		"<tr><td>Uptime</td><td>" + data.uptime + "</td></tr>" +
 		"<tr><td>Display</td><td>" + data.display + "</td></tr>" +
 		buttons +
 		leds +

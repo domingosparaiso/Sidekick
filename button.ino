@@ -1,5 +1,6 @@
 #include "Sidekick.h"
 #include "wificonfig.h"
+#include "cookie.h"
 // Buttons control
 
 bool in_button_check = false;
@@ -93,16 +94,16 @@ void button_init() {
 // register webserver endpoints
 void button_register() {
   #ifdef BUTTON_POWER_PIN
-    server.on("/button/power", HTTP_GET, []() { button_power_action(); send_result_json("OK"); });
-    server.on("/button/get/power", HTTP_GET, []() { server.send(200, "application/json", "{ \"button_power\": \"" + String(button_power()?"ON":"OFF") + "\"}"); });
+    authOn("/button/power", HTTP_GET, []() { button_power_action(); send_result_json("OK"); });
+    authOn("/button/get/power", HTTP_GET, []() { server.send(200, "application/json", "{ \"button_power\": \"" + String(button_power()?"ON":"OFF") + "\"}"); });
   #endif
   #ifdef BUTTON_RESET_PIN
-    server.on("/button/reset", HTTP_GET, []() { button_reset_action(); send_result_json("OK"); });
-    server.on("/button/get/reset", HTTP_GET, []() { server.send(200, "application/json", "{ \"button_reset\": \"" + String(button_reset()?"ON":"OFF") + "\"}"); });
+    authOn("/button/reset", HTTP_GET, []() { button_reset_action(); send_result_json("OK"); });
+    authOn("/button/get/reset", HTTP_GET, []() { server.send(200, "application/json", "{ \"button_reset\": \"" + String(button_reset()?"ON":"OFF") + "\"}"); });
   #endif
   #ifdef BUTTON_RECONFIGURE_PIN
-    server.on("/button/reconfigure", HTTP_GET, []() { button_reconfigure_action(); send_result_json("OK"); });
-    server.on("/button/get/reconfigure", HTTP_GET, []() { server.send(200, "application/json", "{ \"button_reconfigure\": \"" + String(button_reconfigure()?"ON":"OFF") + "\"}"); });
+    authOn("/button/reconfigure", HTTP_GET, []() { button_reconfigure_action(); send_result_json("OK"); });
+    authOn("/button/get/reconfigure", HTTP_GET, []() { server.send(200, "application/json", "{ \"button_reconfigure\": \"" + String(button_reconfigure()?"ON":"OFF") + "\"}"); });
   #endif
 }
 

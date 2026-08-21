@@ -1,5 +1,6 @@
 #include "Sidekick.h"
 #include "wificonfig.h"
+#include "cookie.h"
 // RPM control
 // array [ CPU, SYS#1, SYS#2, SYS#3, SYS#4 ]
 #include <Ticker.h>
@@ -94,18 +95,18 @@ void updateRPMs() {
 
 void rpm_register() {
   #ifdef RPM_CPU_PIN
-  server.on("/rpm/cpu", HTTP_GET, []() { server.send(200, "application/json", "{ \"rpm_cpu\": \"" + String(FAN_CPU.rpm) + "\"}"); });
-  #endif  
+  authOn("/rpm/cpu", HTTP_GET, []() { server.send(200, "application/json", "{ \"rpm_cpu\": \"" + String(FAN_CPU.rpm) + "\"}"); });
+  #endif
   #ifdef RPM_SYS1_PIN
-  server.on("/rpm/sys1", HTTP_GET, []() { server.send(200, "application/json", "{ \"rpm_sys1\": \"" + String(FAN_SYS1.rpm) + "\"}"); });
+  authOn("/rpm/sys1", HTTP_GET, []() { server.send(200, "application/json", "{ \"rpm_sys1\": \"" + String(FAN_SYS1.rpm) + "\"}"); });
   #endif
   #ifdef RPM_SYS2_PIN
-  server.on("/rpm/sys2", HTTP_GET, []() { server.send(200, "application/json", "{ \"rpm_sys2\": \"" + String(FAN_SYS2.rpm) + "\"}"); });
+  authOn("/rpm/sys2", HTTP_GET, []() { server.send(200, "application/json", "{ \"rpm_sys2\": \"" + String(FAN_SYS2.rpm) + "\"}"); });
   #endif
   #ifdef RPM_SYS3_PIN
-  server.on("/rpm/sys3", HTTP_GET, []() { server.send(200, "application/json", "{ \"rpm_sys3\": \"" + String(FAN_SYS3.rpm) + "\"}"); });
+  authOn("/rpm/sys3", HTTP_GET, []() { server.send(200, "application/json", "{ \"rpm_sys3\": \"" + String(FAN_SYS3.rpm) + "\"}"); });
   #endif
   #ifdef RPM_SYS4_PIN
-  server.on("/rpm/sys4", HTTP_GET, []() { server.send(200, "application/json", "{ \"rpm_sys4\": \"" + String(FAN_SYS4.rpm) + "\"}"); });
+  authOn("/rpm/sys4", HTTP_GET, []() { server.send(200, "application/json", "{ \"rpm_sys4\": \"" + String(FAN_SYS4.rpm) + "\"}"); });
   #endif
 }

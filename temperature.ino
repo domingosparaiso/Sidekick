@@ -1,5 +1,6 @@
 #include "Sidekick.h"
 #include "wificonfig.h"
+#include "cookie.h"
 
 #ifdef TEMP_WIRE_PIN
 #include <DS18B20.h>
@@ -78,11 +79,11 @@ void temperature_init() {
 
 void temperature_register() {
   #ifdef TEMP_WIRE_PIN
-    server.on("/temperature", HTTP_GET, []() { 
-      String location = server.arg("location")
+    authOn("/temperature", HTTP_GET, []() {
+      String location = server.arg("location");
       server.send(200, "application/json", "{ \"temperature\": \"" + String(temperature_get(location)) + "\"}");
     });
-    server.on("/temperature/map", HTTP_GET, []() {
+    authOn("/temperature/map", HTTP_GET, []() {
       String devs[5] = { "cpu", "sys1", "sys2", "sys3", "sys4" };
       String pos = server.arg("pos");
       String map = server.arg("map");

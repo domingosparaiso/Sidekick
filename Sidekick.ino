@@ -2,6 +2,10 @@
 #include "config.h"
 #include "Sidekick.h"
 #include "storage.h"
+// Included here (instead of only in the files that use it) so that Arduino's
+// auto-generated function prototypes -- inserted at the top of the merged sketch --
+// see the HTTPMethod/WebServer types before they are referenced (e.g. by authOn() in cookie.ino).
+#include "wificonfig.h"
 
 bool block_loop = false;
 String serialNumber = "";
