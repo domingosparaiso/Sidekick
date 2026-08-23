@@ -128,7 +128,7 @@ function fdel(fname) {
 }
 function formatar() {
   if(confirm('This will be wipe all configurations and files on the storage, confirm?')) {
-    window.location.href('/format');
+    window.location.href = '/format';
   }
 }
 </script>
