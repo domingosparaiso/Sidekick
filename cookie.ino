@@ -10,8 +10,6 @@
   #include <bearssl/bearssl.h>
 #endif
 
-#define MAX_SESSIONS 10
-
 class cookieItem {
   public:
     String id;
@@ -48,6 +46,8 @@ int checkCookie(SidekickRequest request) {
             String hashCookie = cookieHeader.substring(index + 1);
             for(int i=0;i<MAX_SESSIONS;i++) {
                 if(cookie_storage[i]->timeout != 0 && hashCookie.equals(cookie_storage[i]->id)) {
+					// Renew cookie
+					cookie_storage[i]->timeout = millis() + COOKIE_TIMEOUT_MS;
                     return(1);
                 }
             }

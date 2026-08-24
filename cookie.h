@@ -2,10 +2,12 @@
 
 #include <functional>
 
+// Max of concurrent users
+#define MAX_SESSIONS 10
 // Name of the browser cookie used to hold the session token
 #define COOKIE_NAME "mySessionID"
-// Session retention time (1h)
-#define COOKIE_TIMEOUT_MS 3600000UL
+// Session retention time (5 min)
+#define COOKIE_TIMEOUT_MS 300000UL
 
 int checkCookie(SidekickRequest request);
 void initCookies();
