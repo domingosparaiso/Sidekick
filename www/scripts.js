@@ -188,6 +188,7 @@ function update_resources(data) {
 		"<tr><td>Board</td><td>" + data.board + "</td></tr>" +
 		"<tr><td>Frequency</td><td>" + data.mhz + " Mhz</td></tr>" +
 		"<tr><td>Uptime</td><td>" + data.uptime + "</td></tr>" +
+		"<tr><td>Serial Console</td><td>" + data.serialconsole + "</td></tr>" +
 		"<tr><td>Display</td><td>" + data.display + "</td></tr>" +
 		buttons +
 		leds +

@@ -65,11 +65,17 @@ void setup() {
   console_log("\n");
 
   // Initialize resource list
-  resourcesJson = String("{\"board\": \"") + String(ARDUINO_BOARD) + 
-                  String("\", \"mhz\":\"") + String(F_CPU / 1000000) +
-                  String("\", \"display\":\"") + String(DISPLAY_NAME) + String("\",") +
-                  String("\"version\": \"") + String(VERSION) + String("\",") +
-                  String("\"serialNumber\": \"") + String(serialNumber) + "\"";
+  resourcesJson = String(   "{\"board\": \"")        + String(ARDUINO_BOARD)
+                + String("\", \"mhz\":\"")           + String(F_CPU / 1000000)
+                + String("\", \"display\":\"")       + String(DISPLAY_NAME)
+                + String("\", \"version\": \"")      + String(VERSION)
+                + String("\", \"serialNumber\": \"") + String(serialNumber)
+                + String("\", \"serialconsole\": \"")
+#ifdef HOST_SERIAL
+                + "yes (" + String(HOST_BAUD) + ")\"";
+#else
+                + "no\"";
+#endif
 
   // [data.ino] Initialize SPIFFS data.ino
   storage_init();
