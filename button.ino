@@ -3,6 +3,13 @@
 #include "cookie.h"
 // Buttons control
 
+// Forward declaration: some build tools (unlike arduino-cli) don't auto-generate
+// prototypes across .ino files, needed here since led.ino merges after this file.
+// (relay_set()'s prototype, with its default request argument, lives in wificonfig.h.)
+#ifdef LED_POWER_PIN
+  bool led_power();
+#endif
+
 bool in_button_check = false;
 bool last_status_button_power = false;
 bool last_status_button_reset = false;
@@ -94,16 +101,16 @@ void button_init() {
 // register webserver endpoints
 void button_register() {
   #ifdef BUTTON_POWER_PIN
-    authOn("/button/power", HTTP_GET, []() { button_power_action(); send_result_json("OK"); });
-    authOn("/button/get/power", HTTP_GET, []() { server.send(200, "application/json", "{ \"button_power\": \"" + String(button_power()?"ON":"OFF") + "\"}"); });
+    authOn("/button/power", HTTP_GET, [](SidekickRequest request) { button_power_action(); send_result_json(request, "OK"); });
+    authOn("/button/get/power", HTTP_GET, [](SidekickRequest request) { req_send(request, 200, "application/json", "{ \"button_power\": \"" + String(button_power()?"ON":"OFF") + "\"}"); });
   #endif
   #ifdef BUTTON_RESET_PIN
-    authOn("/button/reset", HTTP_GET, []() { button_reset_action(); send_result_json("OK"); });
-    authOn("/button/get/reset", HTTP_GET, []() { server.send(200, "application/json", "{ \"button_reset\": \"" + String(button_reset()?"ON":"OFF") + "\"}"); });
+    authOn("/button/reset", HTTP_GET, [](SidekickRequest request) { button_reset_action(); send_result_json(request, "OK"); });
+    authOn("/button/get/reset", HTTP_GET, [](SidekickRequest request) { req_send(request, 200, "application/json", "{ \"button_reset\": \"" + String(button_reset()?"ON":"OFF") + "\"}"); });
   #endif
   #ifdef BUTTON_RECONFIGURE_PIN
-    authOn("/button/reconfigure", HTTP_GET, []() { button_reconfigure_action(); send_result_json("OK"); });
-    authOn("/button/get/reconfigure", HTTP_GET, []() { server.send(200, "application/json", "{ \"button_reconfigure\": \"" + String(button_reconfigure()?"ON":"OFF") + "\"}"); });
+    authOn("/button/reconfigure", HTTP_GET, [](SidekickRequest request) { button_reconfigure_action(); send_result_json(request, "OK"); });
+    authOn("/button/get/reconfigure", HTTP_GET, [](SidekickRequest request) { req_send(request, 200, "application/json", "{ \"button_reconfigure\": \"" + String(button_reconfigure()?"ON":"OFF") + "\"}"); });
   #endif
 }
 

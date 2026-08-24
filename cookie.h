@@ -7,10 +7,11 @@
 // Session retention time (1h)
 #define COOKIE_TIMEOUT_MS 3600000UL
 
-int checkCookie();
+int checkCookie(SidekickRequest request);
 void initCookies();
-void setCookie();
-void serveLoginPage();
-void serveIndexPage();
-void authOn(const String &uri, HTTPMethod method, std::function<void(void)> handler);
+String setCookie();
+void serveLoginPage(SidekickRequest request);
+void serveIndexPage(SidekickRequest request);
+void authOn(const String &uri, SidekickHTTPMethod method, SidekickHandler handler);
+void authOnUpload(const String &uri, SidekickHTTPMethod method, SidekickHandler onComplete, SidekickUploadHandler onChunk);
 void loginServerInit();

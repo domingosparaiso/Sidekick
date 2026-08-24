@@ -35,14 +35,14 @@ void initCookies() {
     }
 }
 
-int checkCookie() {
+int checkCookie(SidekickRequest request) {
     for(int i=0;i<MAX_SESSIONS;i++) {
         if(cookie_storage[i]->timeout != 0 && cookie_storage[i]->timeout < millis()) {
             cookie_storage[i]->timeout = 0;
         }
     }
-    if (server.hasHeader("Cookie")) {
-        String cookieHeader = server.header("Cookie");
+    if (req_hasHeader(request, "Cookie")) {
+        String cookieHeader = req_header(request, "Cookie");
         int index = cookieHeader.indexOf("=");
         if (cookieHeader.substring(0,index).equals(COOKIE_NAME)) {
             String hashCookie = cookieHeader.substring(index + 1);
@@ -94,8 +94,8 @@ String generateRandomHash() {
   return hashString;
 }
 
-// Create a new session, store its hash and send it to the browser as a cookie (1h retention)
-void setCookie() {
+// Create a new session and return the "Set-Cookie" header value to send it to the browser (1h retention)
+String setCookie() {
   String hash = generateRandomHash();
 
   // reuse a free slot, or replace the oldest session if the table is full
@@ -115,62 +115,68 @@ void setCookie() {
 
   cookie_storage[slot]->id = hash;
   cookie_storage[slot]->timeout = millis() + COOKIE_TIMEOUT_MS;
-  server.sendHeader("Set-Cookie", String(COOKIE_NAME) + "=" + hash + "; Max-Age=3600; Path=/; HttpOnly");
+  return String(COOKIE_NAME) + "=" + hash + "; Max-Age=3600; Path=/; HttpOnly";
 }
 
 // Serve the login page: prefer a custom login.html from storage, fallback to the hardcoded minimal page
-void serveLoginPage() {
+void serveLoginPage(SidekickRequest request) {
   if(LittleFS.exists("/login.html")) {
-    File loginFile = LittleFS.open("/login.html", "r");
-    if(loginFile) {
-      server.streamFile(loginFile, "text/html");
-      loginFile.close();
-      return;
-    }
+    req_sendFile(request, "/login.html", "text/html");
+    return;
   }
-  server.send(200, "text/html", loginHtmlFallback);
+  req_send(request, 200, "text/html", loginHtmlFallback);
 }
 
 // Serve the main application page (index.html) from storage
-void serveIndexPage() {
-  String indexHtmlFS = "<html><body><h1>File 'index.html' not found.</h1><hr><a href=/fs>Upload Files</a></body></html>";
+void serveIndexPage(SidekickRequest request) {
   if(LittleFS.exists("/index.html")) {
-    File storage = LittleFS.open("/index.html", "r");
-    if(storage) {
-      indexHtmlFS = storage.readString();
-      storage.close();
-    }
+    req_sendFile(request, "/index.html", "text/html");
+    return;
   }
-  server.send(200, "text/html", indexHtmlFS);
+  req_send(request, 200, "text/html", "<html><body><h1>File 'index.html' not found.</h1><hr><a href=/fs>Upload Files</a></body></html>");
 }
 
 // Register a protected endpoint: only calls the real handler when a valid session cookie is present,
 // otherwise serves the login page
-void authOn(const String &uri, HTTPMethod method, std::function<void(void)> handler) {
-  server.on(uri, method, [handler]() {
-    if(checkCookie()) {
-      handler();
+void authOn(const String &uri, SidekickHTTPMethod method, SidekickHandler handler) {
+  req_on(uri, method, [handler](SidekickRequest request) {
+    if(checkCookie(request)) {
+      handler(request);
     } else {
-      serveLoginPage();
+      serveLoginPage(request);
     }
   });
 }
 
+// Same as authOn(), but for an upload endpoint (protects the completion handler only,
+// same as the original per-endpoint behavior; upload chunk handlers check the cookie themselves)
+void authOnUpload(const String &uri, SidekickHTTPMethod method, SidekickHandler onComplete, SidekickUploadHandler onChunk) {
+  req_onUpload(uri, method, [onComplete](SidekickRequest request) {
+    if(checkCookie(request)) {
+      onComplete(request);
+    } else {
+      serveLoginPage(request);
+    }
+  }, onChunk);
+}
+
 // Validate credentials against CFG.data.userName/password, open a session and redirect to "/"
-void handleLoginSubmit() {
-  String userName = server.arg("userName");
-  String password = server.arg("password");
+void handleLoginSubmit(SidekickRequest request) {
+  String userName = req_arg(request, "userName");
+  String password = req_arg(request, "password");
+  ReqHeader headers[2];
+  int n = 0;
+  String location = "/login?error=1";
   if(userName.equals(String(CFG.data.userName)) && password.equals(String(CFG.data.password))) {
-    setCookie();
-    server.sendHeader("Location", "/");
-  } else {
-    server.sendHeader("Location", "/login?error=1");
+    headers[n++] = { "Set-Cookie", setCookie() };
+    location = "/";
   }
-  server.send(302, "text/plain", "");
+  headers[n++] = { "Location", location };
+  req_send(request, 302, "text/plain", "", headers, n);
 }
 
 // Register the public login endpoints (must remain accessible without a cookie)
 void loginServerInit() {
-  server.on("/login", HTTP_GET, serveLoginPage);
-  server.on("/login", HTTP_POST, handleLoginSubmit);
+  req_on("/login", HTTP_GET, serveLoginPage);
+  req_on("/login", HTTP_POST, handleLoginSubmit);
 }

@@ -37,6 +37,21 @@ body {
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
+/* Login page (does not affect #bodydiv used by index.html) */
+.login-body {
+	align-items: center;
+}
+
+.login-card {
+	width: 100%;
+	max-width: 360px;
+	background: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	padding: 25px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
 /* Header & Logo */
 img[src='logo.jpg'] {
 	max-width: 100%;
@@ -270,4 +285,29 @@ a {
 
 a:hover {
 	text-decoration: underline;
+}
+
+/* Console (Serial-over-WebSocket terminal) */
+#console-terminal {
+	height: 60vh;
+	background: #1e1e1e;
+	border-radius: 6px;
+	padding: 6px;
+	margin-top: 10px;
+}
+
+.console-status {
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-size: 0.8rem;
+}
+
+.console-online {
+	background: var(--success-color);
+	color: #fff;
+}
+
+.console-offline {
+	background: var(--danger-color);
+	color: #fff;
 }

@@ -96,8 +96,8 @@
 
 // --- data.ino ------------------------------------------------------------------
 // when no config was found, the system start into a failsafe mode, using this default values
-#define DEFAULT_SSID "SOTELE#2Ghz"
-#define DEFAULT_PASS "mamusKa#76"
+#define DEFAULT_SSID "changeme"
+#define DEFAULT_PASS "changeme"
 // default SSID when in AP name (reconfigure mode)
 #define DEFAULT_AP_SSID "SIDEKICK_AP"
 // default password to connect into AP

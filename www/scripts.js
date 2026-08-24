@@ -181,6 +181,7 @@ function update_resources(data) {
 		document.getElementById('no-hardware').style.display = 'none';
 		document.getElementById('temperature-table').style.display = 'block';
 	}
+	document.getElementById('menu-console-button').style.display = (data.console != undefined) ? 'block' : 'none';
 	Htable = "<table>" +
 		"<tr><td>Serial</td><td>" + data.serialNumber + "</td></tr>" +
 		"<tr><td>Version</td><td>" + data.version + "</td></tr>" +
@@ -201,6 +202,61 @@ function update_resources(data) {
 function update_page() {
 	updatepg++;
 	if(updatepg == 2) show('menu-control','main');
+}
+
+consoleTerm = null;
+consoleFit = null;
+consoleWs = null;
+consoleStarted = false;
+
+function console_connect() {
+	statusEl = document.getElementById('console-status');
+	consoleWs = new WebSocket('ws://' + location.host + '/console-ws');
+	consoleWs.binaryType = 'arraybuffer';
+
+	consoleWs.onopen = () => {
+		statusEl.textContent = 'connected';
+		statusEl.className = 'console-status console-online';
+		consoleTerm.writeln('\r\n\x1b[32m*** WebSocket connected ***\x1b[0m\r\n');
+	};
+
+	consoleWs.onclose = () => {
+		statusEl.textContent = 'disconnected';
+		statusEl.className = 'console-status console-offline';
+		consoleTerm.writeln('\r\n\x1b[31m*** WebSocket disconnected. Reconnecting... ***\x1b[0m\r\n');
+		setTimeout(console_connect, 2000);
+	};
+
+	consoleWs.onerror = () => consoleWs.close();
+
+	consoleWs.onmessage = (event) => {
+		if(event.data instanceof ArrayBuffer) {
+			consoleTerm.write(new Uint8Array(event.data));
+		} else {
+			consoleTerm.write(event.data);
+		}
+	};
+}
+
+function open_console() {
+	if(consoleStarted) {
+		if(consoleFit) consoleFit.fit();
+		return;
+	}
+	consoleStarted = true;
+	consoleTerm = new Terminal({ cursorBlink: true, convertEol: true, fontSize: 14, theme: { background: '#1e1e1e' } });
+	consoleFit = new FitAddon.FitAddon();
+	consoleTerm.loadAddon(consoleFit);
+	consoleTerm.open(document.getElementById('console-terminal'));
+	consoleFit.fit();
+	window.addEventListener('resize', () => { if(consoleFit) consoleFit.fit(); });
+
+	// Everything typed in the terminal is sent to the ESP32
+	consoleTerm.onData((data) => {
+		if(consoleWs && consoleWs.readyState === WebSocket.OPEN) consoleWs.send(data);
+	});
+
+	console_connect();
 }
 
 window.onload = function() {

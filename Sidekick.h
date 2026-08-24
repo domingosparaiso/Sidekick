@@ -1,7 +1,13 @@
 #pragma once
 
-#define VERSION "0.01b"
+#define VERSION "0.02"
 
+// Use to access host's serial console
+#define HOST_SERIAL Serial
+#define HOST_BAUD 115200
+// Use to show Sidekick's own debug messages over a serial connection.
+// Comment out (leave undefined) to disable console messages entirely.
+//#define CONSOLE_SERIAL Serial
 #define CONSOLE_BAUD 115200
 #define TIMEOUT_CONSOLE 5000
 #define WAIT_TIME_TO_REBOOT 5000

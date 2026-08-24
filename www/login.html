@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
-<div id='bodydiv' style='max-width:360px'>
-<img src='logo.jpg' style='width:100%' onerror="this.style.display='none'">
-<h2 style='margin:20px 0;color:var(--accent-cyan);text-align:center'>Login</h2>
+<body class='login-body'>
+<div class='login-card'>
+<div style='display:flex'>
+<div><img src='minilogo.jpg' style='width:100%' onerror="this.style.display='none'"></div>
+<div><h2 style='margin:20px;color:var(--accent-cyan);text-align:center'>Login</h2></div>
+</div>
 <form method='POST' action='/login'>
 <table>
 <tr><td>User</td><td><input name='userName' id='userName' type='text' size=20 autofocus></td></tr>

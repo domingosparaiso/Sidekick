@@ -15,38 +15,42 @@ uint8_t otaDone = 0;
 File uploadFile;
 long timeout_reboot = 0;
 
-void handleUpdateEnd() {
-  server.sendHeader("Connection", "close");
+// Completion handler for "/update": fires once the firmware body was fully received
+void handleUpdateEnd(SidekickRequest request) {
+  ReqHeader headers[3];
+  int n = 0;
+  headers[n++] = { "Connection", "close" };
   if (Update.hasError()) {
-    server.send(502, "text/plain", "Update Error.");
+    req_send(request, 502, "text/plain", "Update Error.", headers, n);
   } else {
-    server.sendHeader("Refresh", "10");
-    server.sendHeader("Location", "/");
-    server.send(307);
+    headers[n++] = { "Refresh", "10" };
+    headers[n++] = { "Location", "/" };
+    req_send(request, 307, "text/html", "", headers, n);
     ESP.restart();
   }
 }
 
-void handleUpdate() {
-  if(!checkCookie()) return;
-  size_t fsize = 0;
-  if (server.hasArg("size")) {
-    fsize = server.arg("size").toInt();
-  }
-  HTTPUpload &upload = server.upload();
-  if (upload.status == UPLOAD_FILE_START) {
-      display_status(STATUS_UPLOAD_FILE_START);
+// Upload chunk handler for "/update": index==0 is the first chunk, final==true is the last one
+void handleUpdateChunk(SidekickRequest request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+  if(!checkCookie(request)) return;
+  display_status(STATUS_UPDATE_FIRMWARE);
+  if (index == 0) {
+    display_status(STATUS_UPLOAD_FILE_START);
+    size_t fsize = 0;
+    if (req_hasArg(request, "size")) fsize = req_arg(request, "size").toInt();
     if (!Update.begin(fsize)) {
       otaDone = 0;
     }
-  } else if (upload.status == UPLOAD_FILE_WRITE) {
-    if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+  }
+  if (len) {
+    if (Update.write(data, len) != len) {
       display_status(STATUS_UPLOAD_FILE_RUN);
     } else {
       otaDone = 100 * Update.progress() / Update.size();
       display_print(2, 1, String(otaDone));
     }
-  } else if (upload.status == UPLOAD_FILE_END) {
+  }
+  if (final) {
     if (Update.end(true)) {
       display_status(STATUS_UPLOAD_FILE_OK);
     } else {
@@ -82,7 +86,7 @@ String config_json() {
   String result =   "{ \"userName\": \"" +       String(CFG.data.userName) +         "\"," +
                       "\"hostname\": \"" +         String(CFG.data.hostname) +         "\"," +
                       "\"CLI_wifi_SSID\":\"" +     String(CFG.data.CLI.wifi.SSID) +     "\"," +
-                      "\"CLI_wifi_password\":\"" + String(CFG.data.CLI.wifi.password) + "\"," + 
+                      "\"CLI_wifi_password\":\"" + String(CFG.data.CLI.wifi.password) + "\"," +
                       "\"CLI_DHCP\":\"" +          DHCPcfg +                            "\"," +
                       "\"CLI_IP\": [\"" +          String(CFG.data.CLI.IP[0]) +         "\"," +
                                       "\"" +        String(CFG.data.CLI.IP[1]) +         "\"," +
@@ -113,64 +117,55 @@ String config_json() {
   return(result);
 }
 
-void reconfigure() {
+void reconfigure(SidekickRequest request) {
   String seq;
-  server.arg("userName").toCharArray(CFG.data.userName, 32);
-  server.arg("hostname").toCharArray(CFG.data.hostname, 32);
-  server.arg("password").toCharArray(CFG.data.password, 32);
-  server.arg("AP_SSID").toCharArray(CFG.data.AP.SSID,32);
-  server.arg("AP_password").toCharArray(CFG.data.AP.password,32);
-  server.arg("CLI_wifi_SSID").toCharArray(CFG.data.CLI.wifi.SSID, 32);
-  server.arg("CLI_wifi_password").toCharArray(CFG.data.CLI.wifi.password, 32);
-  CFG.data.CLI.DHCP = (server.arg("CLI_DHCP")=="dhcp");
+  req_arg(request, "userName").toCharArray(CFG.data.userName, 32);
+  req_arg(request, "hostname").toCharArray(CFG.data.hostname, 32);
+  req_arg(request, "password").toCharArray(CFG.data.password, 32);
+  req_arg(request, "AP_SSID").toCharArray(CFG.data.AP.SSID,32);
+  req_arg(request, "AP_password").toCharArray(CFG.data.AP.password,32);
+  req_arg(request, "CLI_wifi_SSID").toCharArray(CFG.data.CLI.wifi.SSID, 32);
+  req_arg(request, "CLI_wifi_password").toCharArray(CFG.data.CLI.wifi.password, 32);
+  CFG.data.CLI.DHCP = (req_arg(request, "CLI_DHCP")=="dhcp");
   if(!CFG.data.CLI.DHCP) {
     for(int c=1; c<=4; c++) {
       seq = String(c);
-      CFG.data.CLI.IP[c-1] = (uint8_t) server.arg(String("CLI_IP_")+seq).toInt(); //endereço IP
-      CFG.data.CLI.MASK[c-1] = (uint8_t) server.arg(String("CLI_MASK_")+seq).toInt(); //mascara subrede
-      CFG.data.CLI.GW[c-1] = (uint8_t) server.arg(String("CLI_GW_")+seq).toInt(); //gateway
-      CFG.data.CLI.DNS[c-1] = (uint8_t) server.arg(String("CLI_DNS_")+seq).toInt(); //dns
+      CFG.data.CLI.IP[c-1] = (uint8_t) req_arg(request, String("CLI_IP_")+seq).toInt(); //endereço IP
+      CFG.data.CLI.MASK[c-1] = (uint8_t) req_arg(request, String("CLI_MASK_")+seq).toInt(); //mascara subrede
+      CFG.data.CLI.GW[c-1] = (uint8_t) req_arg(request, String("CLI_GW_")+seq).toInt(); //gateway
+      CFG.data.CLI.DNS[c-1] = (uint8_t) req_arg(request, String("CLI_DNS_")+seq).toInt(); //dns
     }
   }
   for(int c=1; c<=5; c++) {
     CFG.data.maptemp[c-1] = 0;
     seq = String(c);
-    if(server.arg("TMAP_"+seq).length() > 0) {
-      CFG.data.maptemp[c-1] = server.arg("TMAP_"+seq).toInt();
+    if(req_arg(request, "TMAP_"+seq).length() > 0) {
+      CFG.data.maptemp[c-1] = req_arg(request, "TMAP_"+seq).toInt();
     }
-    
+
   }
   CFG.data.timeout_backlight = 0;
-  if(server.arg("timeout").length() > 0) CFG.data.timeout_backlight = server.arg("timeout").toInt();
+  if(req_arg(request, "timeout").length() > 0) CFG.data.timeout_backlight = req_arg(request, "timeout").toInt();
   save_CFG();
-  server.send(200, "text/html", "<html><body style='margin:0;padding:0;border:0'><div id=m>Configuration Saved</div></body><script>setTimeout(()=>{getElementeById('m').innerHTML='';},10000);</script></html>");
+  req_send(request, 200, "text/html", "<html><body style='margin:0;padding:0;border:0'><div id=m>Configuration Saved</div></body><script>setTimeout(()=>{getElementeById('m').innerHTML='';},10000);</script></html>");
 }
 
-void handleFileUpload() {
-  if(!checkCookie()) return;
-  HTTPUpload& upload = server.upload();
-  if (upload.status == UPLOAD_FILE_START) {
-    String filename = upload.filename;
-    // Make sure paths always start with "/"
-    if (!filename.startsWith("/")) { filename = "/" + filename; }
-    //uploadFile = fileSystem->open(filename, "w");
-    if(filename == "/config.bin") return;
-    uploadFile = LittleFS.open((String("/") + upload.filename).c_str(), "w"); 
-    if (!uploadFile) {
-      return;
+// Upload chunk handler for "/fs-upload": index==0 is the first chunk, final==true is the last one
+void handleFileUploadChunk(SidekickRequest request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+  if(!checkCookie(request)) return;
+  if (!filename.startsWith("/")) { filename = "/" + filename; }
+  if (index == 0) {
+    if(filename == "/config.bin") {
+      uploadFile = File();
+    } else {
+      uploadFile = LittleFS.open(filename, "w");
     }
-  } else if (upload.status == UPLOAD_FILE_WRITE) {
-    if (uploadFile) {
-      //size_t bytesWritten = uploadFile.write(upload.buf, upload.currentSize);
-      //if (bytesWritten != upload.currentSize) { return replyServerError(F("WRITE FAILED")); }
-      if(uploadFile.write(upload.buf, upload.currentSize) != upload.currentSize) {
-        //
-      }
-    }
-  } else if (upload.status == UPLOAD_FILE_END) {
-    if (uploadFile) {
-      uploadFile.close();
-    }
+  }
+  if (uploadFile && len) {
+    uploadFile.write(data, len);
+  }
+  if (final && uploadFile) {
+    uploadFile.close();
   }
 }
 
@@ -184,16 +179,16 @@ void configServerInit() {
   authOn("/index.html", HTTP_GET, serveIndexPage);
 
   // Never expose the raw config file (holds userName/password) over HTTP
-  server.on("/config.bin", HTTP_GET, []() { server.send(403, "text/plain", "Forbidden"); });
+  req_on("/config.bin", HTTP_GET, [](SidekickRequest request) { req_send(request, 403, "text/plain", "Forbidden"); });
 
   // Upload page to flash a new firmware
-  authOn("/upload", HTTP_GET, []() {
-    server.send(200, "text/html", uploadHtml);
+  authOn("/upload", HTTP_GET, [](SidekickRequest request) {
+    req_send(request, 200, "text/html", uploadHtml);
   });
 
   // Reboot the device
-  authOn("/reboot", HTTP_GET, []() {
-    server.send(200, "text/html", "<html><body><h1>Reboot in progress...</h1></body></html>");
+  authOn("/reboot", HTTP_GET, [](SidekickRequest request) {
+    req_send(request, 200, "text/html", "<html><body><h1>Reboot in progress...</h1></body></html>");
     display_status(STATUS_REBOOT);
     console_log("Reboot in progress...");
     timeout_reboot = millis() + WAIT_TIME_TO_REBOOT;
@@ -208,37 +203,27 @@ void configServerInit() {
   relay_register();
   rpm_register();
   temperature_register();
+  hostconsole_register();
 
   // return a json with all resources
-  authOn("/resources.json", HTTP_GET, []() {
-    //console_log("GET> resources.json\n");
+  authOn("/resources.json", HTTP_GET, [](SidekickRequest request) {
     String result = resourcesJson.substring(0, resourcesJson.length() - 1) + ",\"uptime\":\"" + uptime_string() + "\"}";
-    server.send(200, "application/json", result);
+    req_send(request, 200, "application/json", result);
   });
 
   // return a json with actual configuration
-  authOn("/config.json", HTTP_GET, []() {
-    server.send(200, "application/json", config_json());
+  authOn("/config.json", HTTP_GET, [](SidekickRequest request) {
+    req_send(request, 200, "application/json", config_json());
   });
 
   // Firmware update
-  server.on(
-    "/update", HTTP_POST,
-    []() {
-      if(!checkCookie()) { serveLoginPage(); return; }
-      handleUpdateEnd();
-    },
-    []() {
-      display_status(STATUS_UPDATE_FIRMWARE);
-      handleUpdate();
-    }
-  );
+  authOnUpload("/update", HTTP_POST, handleUpdateEnd, handleUpdateChunk);
 
   // Delete files from storage
-  authOn("/delete", HTTP_GET, []() {
-    for (uint8_t i = 0; i < server.args(); i++) {
-      if(String(server.argName(i)) == "arq") {
-        String fname = String(server.arg(i));
+  authOn("/delete", HTTP_GET, [](SidekickRequest request) {
+    for (int i = 0; i < req_args(request); i++) {
+      if(req_argName(request, i) == "arq") {
+        String fname = req_argValue(request, i);
         if(!fname.startsWith("/")) {
           fname = "/" + fname;
         }
@@ -247,24 +232,24 @@ void configServerInit() {
         }
       }
     }
-    server.send(200, "text/plain", "");
+    req_send(request, 200, "text/plain", "");
   });
 
   // storage format
-  authOn("/format", HTTP_GET, []() {
+  authOn("/format", HTTP_GET, [](SidekickRequest request) {
     display_status(STATUS_FORMAT_FS);
     console_log("<STORAGE FORMAT>");
     if(LittleFS.format()) {
-      server.send(200, "text/html", "<html><head><link rel='stylesheet' href='style.css'></head><body>Flash storage formated.<hr><a href=/home>Home</a></body></html>");
+      req_send(request, 200, "text/html", "<html><head><link rel='stylesheet' href='style.css'></head><body>Flash storage formated.<hr><a href=/home>Home</a></body></html>");
       display_status(STATUS_FORMAT_OK);
     } else {
-      server.send(200, "text/html", "<html><head><link rel='stylesheet' href='style.css'></head><body>Error at Flash storage format.<hr><a href=/home>Home</a></body></html>");
+      req_send(request, 200, "text/html", "<html><head><link rel='stylesheet' href='style.css'></head><body>Error at Flash storage format.<hr><a href=/home>Home</a></body></html>");
       display_status(STATUS_FORMAT_ERROR);
     }
   });
 
   // Storage file management
-  authOn("/fs", HTTP_GET, []() {
+  authOn("/fs", HTTP_GET, [](SidekickRequest request) {
     String fsIndex = String(fileHtml);
     String result = "<table>";
     #ifdef ESP8266
@@ -292,28 +277,31 @@ void configServerInit() {
       }
     #endif
     result += "</table></div></body></html>";
-    server.send(200, "text/html", fsIndex + result);
+    req_send(request, 200, "text/html", fsIndex + result);
   });
 
   // File upload
-  server.on("/fs-upload", HTTP_POST, []() {
-      if(!checkCookie()) { serveLoginPage(); return; }
-      server.sendHeader("Connection", "close");
-      server.send(200, "text/plain", "OK");
-    }
-    , handleFileUpload);
+  authOnUpload("/fs-upload", HTTP_POST, [](SidekickRequest request) {
+    ReqHeader headers[1] = { { "Connection", "close" } };
+    req_send(request, 200, "text/plain", "OK", headers, 1);
+  }, handleFileUploadChunk);
 
   // Retrieve files from storage
   server.serveStatic("/", LittleFS, "/");
 
   // url not found, open index.html instead send a 404 error, if index.html doesn't exists, send a message to upload one
-  server.onNotFound([]() {
-    if(!checkCookie()) { serveLoginPage(); return; }
-    serveIndexPage();
+  req_onNotFound([](SidekickRequest request) {
+    if(!checkCookie(request)) { serveLoginPage(request); return; }
+    serveIndexPage(request);
   });
 
   // enable CORS header in webserver results
-  server.enableCORS(true);
+  #ifdef ESP8266
+    server.enableCORS(true);
+  #endif
+  #ifdef ESP32
+    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
+  #endif
 
   // Start webserver
   server.begin();
@@ -329,30 +317,39 @@ void reboot_check() {
  }
 }
 
-// Send a result to browser as json
-void send_result_json(String result) {
-  server.send(200, "application/json", "{ \"result\": \"" + result + "\"}");
+// Send a result to browser as json (no-op if there is no active request, e.g. when called from the polling loop)
+void send_result_json(SidekickRequest request, String result) {
+  if(!request) return;
+  req_send(request, 200, "application/json", "{ \"result\": \"" + result + "\"}");
 }
 
 // Webserver setup
 void server_setup() {
   const char* headerkeys[] = {"Cookie"};
-  size_t headerkeyssize = sizeof(headerkeys) / sizeof(char*);  
+  size_t headerkeyssize = sizeof(headerkeys) / sizeof(char*);
   console_log("--- Server setup\n");
   initCookies();
-  server.collectHeaders(headerkeys, headerkeyssize);  
+  #ifdef ESP8266
+    // ESP8266WebServer discards most headers by default, must opt-in to keep the session cookie.
+    // ESPAsyncWebServer (ESP32) always keeps every parsed request header, no equivalent call needed.
+    server.collectHeaders(headerkeys, headerkeyssize);
+  #endif
   configServerInit();
   Serial.println("Server setup... [OK]");
 }
 
 // Webserver loop
 void server_loop() {
-  // handle webserver clients
-  server.handleClient();
+  #ifdef ESP8266
+    // ESPAsyncWebServer (ESP32) handles clients in the background, no manual pump needed.
+    server.handleClient();
+  #endif
   // check pressed buttons
   button_check();
   // check release relay timeouts
   relay_check();
   // check pending reboot request
   reboot_check();
+  // pump the Console UART<->WebSocket bridge (ESP32 only)
+  hostconsole_loop();
 }

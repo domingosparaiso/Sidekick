@@ -79,14 +79,14 @@ void temperature_init() {
 
 void temperature_register() {
   #ifdef TEMP_WIRE_PIN
-    authOn("/temperature", HTTP_GET, []() {
-      String location = server.arg("location");
-      server.send(200, "application/json", "{ \"temperature\": \"" + String(temperature_get(location)) + "\"}");
+    authOn("/temperature", HTTP_GET, [](SidekickRequest request) {
+      String location = req_arg(request, "location");
+      req_send(request, 200, "application/json", "{ \"temperature\": \"" + String(temperature_get(location)) + "\"}");
     });
-    authOn("/temperature/map", HTTP_GET, []() {
+    authOn("/temperature/map", HTTP_GET, [](SidekickRequest request) {
       String devs[5] = { "cpu", "sys1", "sys2", "sys3", "sys4" };
-      String pos = server.arg("pos");
-      String map = server.arg("map");
+      String pos = req_arg(request, "pos");
+      String map = req_arg(request, "map");
       int int_map = 0;
       int int_pos = pos.toInt();
       for(int i=0; i<5; i++) {
@@ -94,9 +94,9 @@ void temperature_register() {
       }
       if(int_map >= 1 && pos >=1 && pos <= 5) {
         temperature_config(pos.toInt(), int_map);
-        send_result_json("OK");
+        send_result_json(request, "OK");
       } else {
-        send_result_json("Error");
+        send_result_json(request, "Error");
       }
     });
   #endif

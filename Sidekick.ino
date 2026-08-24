@@ -4,7 +4,8 @@
 #include "storage.h"
 // Included here (instead of only in the files that use it) so that Arduino's
 // auto-generated function prototypes -- inserted at the top of the merged sketch --
-// see the HTTPMethod/WebServer types before they are referenced (e.g. by authOn() in cookie.ino).
+// see the SidekickRequest/SidekickHTTPMethod/WebServer types before they are
+// referenced (e.g. by authOn() in cookie.ino).
 #include "wificonfig.h"
 
 bool block_loop = false;
@@ -93,6 +94,9 @@ void setup() {
 
   // [temperature.ino] Initialize temperature configuration
   temperature_init();
+
+  // [console.ino] Initialize the HOST_SERIAL<->WebSocket console bridge (ESP32 only)
+  hostconsole_init();
 
   // end of resource list
   resourcesJson += "}";

@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="xterm.css"><!-- https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css -->
+<script src="xterm.js"></script><!-- https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js -->
+<script src="xterm-addon-fit.js"></script><!-- https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js -->
 <script src="scripts.js"></script>
 </head>
 <body>
@@ -23,6 +26,9 @@
 		</div>
 		<div class=item-main-menu onclick='filesystem();'>
 			Filesystem
+		</div>
+		<div class=item-main-menu id='menu-console-button' style='display:none' onclick="show('menu-console','main'); open_console();">
+			Console
 		</div>
 		<div class=item-main-menu onclick='reboot();'>
 			Reboot
@@ -180,6 +186,12 @@ No hardware configuration.
 <div class='contents upper-menu' id='menu-update'>
 <div class=title>Update firmware</div>
 <a href='/upload'>Click here to open firmware update page...</a>
+</div>
+
+<div class='contents upper-menu' id='menu-console'>
+<div class=title>Console</div>
+<span id='console-status' class='console-status console-offline'>disconnected</span>
+<div id='console-terminal'></div>
 </div>
 
 </div>

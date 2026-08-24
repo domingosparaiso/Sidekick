@@ -33,13 +33,13 @@ void led_init() {
 
 void led_register() {
   #ifdef LED_POWER_PIN
-  authOn("/led/power", HTTP_GET, []() {
-    server.send(200, "application/json", "{ \"led_power\": \"" + String(led_power()?"ON":"OFF") + "\"}");
+  authOn("/led/power", HTTP_GET, [](SidekickRequest request) {
+    req_send(request, 200, "application/json", "{ \"led_power\": \"" + String(led_power()?"ON":"OFF") + "\"}");
   });
   #endif
   #ifdef LED_HDD_PIN
-  authOn("/led/hdd", HTTP_GET, []() {
-    server.send(200, "application/json", "{ \"led_hdd\": \"" + String(led_hdd()?"ON":"OFF") + "\"}");
+  authOn("/led/hdd", HTTP_GET, [](SidekickRequest request) {
+    req_send(request, 200, "application/json", "{ \"led_hdd\": \"" + String(led_hdd()?"ON":"OFF") + "\"}");
   });
   #endif
 }

@@ -1,18 +1,10 @@
 #ifndef SIDEWIFI
 #define SIDEWIFI
 
-#ifdef ESP32
-  #include <WiFi.h>
-  #include <WiFiAP.h>
-  #include <WebServer.h>
-#endif
-
-#ifdef ESP8266
-  #include <ESP8266WiFi.h>
-  #include <WiFiClient.h>
-  #include <ESP8266WebServer.h>
-#endif
-
+// WiFi.h/WiFiAP.h (ESP32) or ESP8266WiFi.h/WiFiClient.h (ESP8266), plus the
+// platform's webserver library, all come from wificonfig.h. Don't include the
+// sync WebServer.h here too: on ESP32 it redefines the HTTPMethod enum that
+// ESPAsyncWebServer.h already declares, which fails to compile.
 #include "wificonfig.h"
 #include "Sidekick.h"
 

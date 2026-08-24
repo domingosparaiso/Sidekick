@@ -34,14 +34,19 @@ void display_status(int status) {
 }
 
 bool console_init() {
-  long timeout = millis() + TIMEOUT_CONSOLE;
-  Serial.begin(CONSOLE_BAUD);
-  while (!Serial && millis() < timeout);
-  console_ok = (!Serial)?false:true;
+  console_ok = false;
+  #ifdef CONSOLE_SERIAL
+    long timeout = millis() + TIMEOUT_CONSOLE;
+    CONSOLE_SERIAL.begin(CONSOLE_BAUD);
+    while (!CONSOLE_SERIAL && millis() < timeout);
+    console_ok = (!CONSOLE_SERIAL)?false:true;
+  #endif
   return(console_ok);
 }
 
 void console_log(String msg) {
   activity(FLASH);
-  if(console_ok) Serial.print(msg);
+  #ifdef CONSOLE_SERIAL
+    if(console_ok) CONSOLE_SERIAL.print(msg);
+  #endif
 }

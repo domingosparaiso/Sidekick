@@ -123,7 +123,7 @@ int cmdString2Int(int relay_port, String cmd) {
   return(ERROR_VALUE);
 }
 
-void relay_set(int relay_port, int value) {
+void relay_set(int relay_port, int value, SidekickRequest request) {
   int level_on;
   int level_off;
   String result = "Error";
@@ -206,33 +206,33 @@ void relay_set(int relay_port, int value) {
     }
     result = "OK";
   }
-  send_result_json(result);
+  if(request) send_result_json(request, result);
 }
 
 void relay_register() {
   #ifdef RELAY_POWER_PIN
-    authOn("/relay/power", HTTP_GET, []() { relay_set(RELAY_POWER_PIN, cmdString2Int(RELAY_POWER_PIN, server.arg("cmd"))); });
+    authOn("/relay/power", HTTP_GET, [](SidekickRequest request) { relay_set(RELAY_POWER_PIN, cmdString2Int(RELAY_POWER_PIN, req_arg(request, "cmd")), request); });
   #endif
   #ifdef RELAY_RESET_PIN
-    authOn("/relay/reset", HTTP_GET, []() { relay_set(RELAY_RESET_PIN, cmdString2Int(RELAY_RESET_PIN, server.arg("cmd"))); });
+    authOn("/relay/reset", HTTP_GET, [](SidekickRequest request) { relay_set(RELAY_RESET_PIN, cmdString2Int(RELAY_RESET_PIN, req_arg(request, "cmd")), request); });
   #endif
   #ifdef RELAY_SYS1_PIN
-    authOn("/relay/sys1", HTTP_GET, []() { relay_set(RELAY_SYS1_PIN, cmdString2Int(RELAY_SYS1_PIN, server.arg("cmd"))); });
+    authOn("/relay/sys1", HTTP_GET, [](SidekickRequest request) { relay_set(RELAY_SYS1_PIN, cmdString2Int(RELAY_SYS1_PIN, req_arg(request, "cmd")), request); });
   #endif
   #ifdef RELAY_SYS2_PIN
-    authOn("/relay/sys2", HTTP_GET, []() { relay_set(RELAY_SYS2_PIN, cmdString2Int(RELAY_SYS2_PIN, server.arg("cmd"))); });
+    authOn("/relay/sys2", HTTP_GET, [](SidekickRequest request) { relay_set(RELAY_SYS2_PIN, cmdString2Int(RELAY_SYS2_PIN, req_arg(request, "cmd")), request); });
   #endif
   #ifdef RELAY_SYS3_PIN
-    authOn("/relay/sys3", HTTP_GET, []() { relay_set(RELAY_SYS3_PIN, cmdString2Int(RELAY_SYS3_PIN, server.arg("cmd"))); });
+    authOn("/relay/sys3", HTTP_GET, [](SidekickRequest request) { relay_set(RELAY_SYS3_PIN, cmdString2Int(RELAY_SYS3_PIN, req_arg(request, "cmd")), request); });
   #endif
   #ifdef RELAY_SYS4_PIN
-    authOn("/relay/sys4", HTTP_GET, []() { relay_set(RELAY_SYS4_PIN, cmdString2Int(RELAY_SYS4_PIN, server.arg("cmd"))); });
+    authOn("/relay/sys4", HTTP_GET, [](SidekickRequest request) { relay_set(RELAY_SYS4_PIN, cmdString2Int(RELAY_SYS4_PIN, req_arg(request, "cmd")), request); });
   #endif
-  authOn("/relay/LOW", HTTP_GET, []() { digitalWrite(0,LOW); server.send(200, "plain/text", "LOW"); });
-  authOn("/relay/HIGH", HTTP_GET, []() { digitalWrite(0,HIGH); server.send(200, "plain/text", "HIGH"); });
+  authOn("/relay/LOW", HTTP_GET, [](SidekickRequest request) { digitalWrite(0,LOW); req_send(request, 200, "plain/text", "LOW"); });
+  authOn("/relay/HIGH", HTTP_GET, [](SidekickRequest request) { digitalWrite(0,HIGH); req_send(request, 200, "plain/text", "HIGH"); });
   #ifdef RELAY_BACK_PIN
-    authOn("/backlight/off", HTTP_GET, []() { relay_set(RELAY_BACK_PIN, RELAY_OFF); });
-    authOn("/backlight/on", HTTP_GET, []() { relay_set(RELAY_BACK_PIN, RELAY_ON); });
+    authOn("/backlight/off", HTTP_GET, [](SidekickRequest request) { relay_set(RELAY_BACK_PIN, RELAY_OFF, request); });
+    authOn("/backlight/on", HTTP_GET, [](SidekickRequest request) { relay_set(RELAY_BACK_PIN, RELAY_ON, request); });
   #endif
 }
 
