@@ -259,6 +259,16 @@ function open_console() {
 	console_connect();
 }
 
+function logout() {
+		fetch('/logout', {
+		method: 'GET'
+	})
+	.then(response => {
+		if (!response.ok) throw new Error(`Erro: ${response.status}`);
+		window.location.href = '/';
+	});
+}
+
 window.onload = function() {
 	fetch('/config.json')
 		.then(res => res.json())

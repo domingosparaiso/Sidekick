@@ -186,6 +186,12 @@ void configServerInit() {
     req_send(request, 200, "text/html", uploadHtml);
   });
 
+  // Logout
+  authOn("/logout", HTTP_GET, [](SidekickRequest request) {
+	  clearCookie(request);
+    req_send(request, 200, "application/json", "{\"status\":\"OK\"}");
+  });
+
   // Reboot the device
   authOn("/reboot", HTTP_GET, [](SidekickRequest request) {
     req_send(request, 200, "text/html", "<html><body><h1>Reboot in progress...</h1></body></html>");

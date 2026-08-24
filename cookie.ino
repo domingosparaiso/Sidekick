@@ -33,7 +33,21 @@ void initCookies() {
     }
 }
 
+void clearCookie(SidekickRequest request) {
+	int i = getIndexCookie(request);
+	if(i<0) return;
+	cookie_storage[i]->timeout = 0;
+}
+
 int checkCookie(SidekickRequest request) {
+	int i = getIndexCookie(request);
+	if(i<0) return(0);
+	// Renew cookie
+	cookie_storage[i]->timeout = millis() + COOKIE_TIMEOUT_MS;
+	return(1);
+}
+
+int getIndexCookie(SidekickRequest request) {
     for(int i=0;i<MAX_SESSIONS;i++) {
         if(cookie_storage[i]->timeout != 0 && cookie_storage[i]->timeout < millis()) {
             cookie_storage[i]->timeout = 0;
@@ -46,14 +60,12 @@ int checkCookie(SidekickRequest request) {
             String hashCookie = cookieHeader.substring(index + 1);
             for(int i=0;i<MAX_SESSIONS;i++) {
                 if(cookie_storage[i]->timeout != 0 && hashCookie.equals(cookie_storage[i]->id)) {
-					// Renew cookie
-					cookie_storage[i]->timeout = millis() + COOKIE_TIMEOUT_MS;
-                    return(1);
+                    return(i);
                 }
             }
         }
     }
-    return(0);
+    return(-1);
 }
 
 String generateRandomHash() {
