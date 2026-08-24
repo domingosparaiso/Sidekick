@@ -261,7 +261,7 @@ function open_console() {
 }
 
 function logout() {
-		fetch('/logout', {
+	fetch('/logout', {
 		method: 'GET'
 	})
 	.then(response => {

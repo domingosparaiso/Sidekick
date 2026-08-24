@@ -30,7 +30,7 @@
 		<div class=item-main-menu id='menu-console-button' style='display:none' onclick="show('menu-console','main'); open_console();">
 			Console
 		</div>
-		<div class=item-main-menu onclick='reboot();'>
+		<div class=item-main-menu onclick='confirmReboot();'>
 			Reboot
 		</div>
 		<div class=item-main-menu onclick='logout();'>
@@ -197,6 +197,40 @@ No hardware configuration.
 <div id='console-terminal'></div>
 </div>
 
+<div id='confirmModal' class='modal-overlay'>
+<div class='modal-box'>
+<div id='confirmMessage' class='modal-message'></div>
+<div class='modal-actions'>
+<div class='modal-btn' onclick='modalCancel();'>Cancel</div>
+<div class='modal-btn modal-btn-confirm' onclick='modalConfirm();'>Confirm</div>
 </div>
+</div>
+</div>
+
+</div>
+<script>
+let modalCallback = null;
+function showConfirm(message, callback) {
+	document.getElementById('confirmMessage').innerHTML = message;
+	modalCallback = callback;
+	document.getElementById('confirmModal').classList.add('modal-show');
+}
+function modalConfirm() {
+	document.getElementById('confirmModal').classList.remove('modal-show');
+	if(modalCallback) {
+		modalCallback();
+	}
+	modalCallback = null;
+}
+function modalCancel() {
+	document.getElementById('confirmModal').classList.remove('modal-show');
+	modalCallback = null;
+}
+function confirmReboot() {
+	showConfirm('This will reboot the device, confirm?', function() {
+		reboot();
+	});
+}
+</script>
 </body>
 </html>

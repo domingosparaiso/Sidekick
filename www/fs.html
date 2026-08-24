@@ -1,58 +1,3 @@
-#pragma once
-
-const char *uploadHtml = R"literal(
-  <!DOCTYPE html>
-  <head><link rel="stylesheet" href="style.css"></head>
-  <body>
-    <div id='bodydiv'>
-    <div><img src='logo.jpg' width='300' height='73' onerror="this.style.display='none'"></div>
-    <h1>Firmware Update</h1>
-    <a href=/>Home</a>
-    <hr>
-    <form method='POST' enctype='multipart/form-data' id='upload-form'>
-    <div class="container-box">
-    <div class='labelup'>
-    <label for='fileup'>Choose firmware...</label>
-    <input name='file' type='file' id='fileup' class='hide-item'>
-    </div>
-    <div class='box' id='fname'></div>
-    <div>
-    <div class='labelup' onclick="submit_update();">Update</div>
-    <input type='submit' class='hide-item' value='Update'>
-    </div>
-    </div>
-    </form>
-    <hr>
-    <br>
-    <div id='prg' style='width:0;color:white;text-align:center'>0%</div>
-    </div>
-  </body>
-  <script>
-    function submit_update() {
-      var form = document.getElementById('upload-form');
-      var prg = document.getElementById('prg');
-      prg.style.backgroundColor = 'blue';
-      var data = new FormData(form);
-      var req = new XMLHttpRequest();
-      var fsize = document.getElementById('fileup').files[0].size;
-      req.open('POST', '/update?size=' + fsize);
-      req.upload.addEventListener('progress', p=>{
-        let w = Math.round(p.loaded/p.total*100) + '%';
-          if(p.lengthComputable){
-             prg.innerHTML = w;
-             prg.style.width = w;
-          }
-          if(w == '100%') prg.style.backgroundColor = 'black';
-      });
-      req.send(data);
-     }
-  </script>
-</body>
-</html>
-)literal";
-
-
-const char *fileHtml = R"literal(
 <html>
 <head>
  <link rel="stylesheet" href="style.css">
@@ -82,6 +27,15 @@ const char *fileHtml = R"literal(
 <div id='percent'></div>
 <hr>
 <div id='filelist'></div>
+<div id='confirmModal' class='modal-overlay'>
+<div class='modal-box'>
+<div id='confirmMessage' class='modal-message'></div>
+<div class='modal-actions'>
+<div class='modal-btn' onclick='modalCancel();'>Cancel</div>
+<div class='modal-btn modal-btn-confirm' onclick='modalConfirm();'>Confirm</div>
+</div>
+</div>
+</div>
 <script>
 const button = document.getElementById('fileup');
 const fname = document.getElementById('fname');
@@ -134,23 +88,37 @@ function submit_form() {
     document.getElementById('entrypoint').style.display = "none";
 }
 function fdel(fname) {
-  console.log('Delete: ' + fname);
-  if(confirm('Delete file ' + fname + ', confirm?')) {
-    const url = '/delete?arq=' + fname;
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url);
-    xhr.send();
-    setTimeout(function() {
-      location.reload();
-    }, 1500);
-  }
+	console.log('Delete: ' + fname);
+	const url = '/delete?arq=' + fname;
+	showConfirm('Delete file ' + fname + ' from filesystem, confirm?', function() {
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', url);
+		xhr.send();
+		setTimeout(function() {
+			location.reload();
+		}, 1500);
+	});
 }
 function formatar() {
-  if(confirm('This will be wipe all configurations and files on the storage, confirm?')) {
+  showConfirm('This will be wipe all configurations and files on the storage, confirm?', function() {
     window.location.href = '/format';
-  }
+  });
+}
+let modalCallback = null;
+function showConfirm(message, callback) {
+	document.getElementById('confirmMessage').innerHTML = message;
+	modalCallback = callback;
+	document.getElementById('confirmModal').classList.add('modal-show');
+}
+function modalConfirm() {
+	document.getElementById('confirmModal').classList.remove('modal-show');
+	if(modalCallback) {
+		modalCallback();
+	}
+	modalCallback = null;
+}
+function modalCancel() {
+	document.getElementById('confirmModal').classList.remove('modal-show');
+	modalCallback = null;
 }
 </script>
-)literal";
-
-// <EOF>

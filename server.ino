@@ -256,14 +256,24 @@ void configServerInit() {
 
   // Storage file management
   authOn("/fs", HTTP_GET, [](SidekickRequest request) {
-    String fsIndex = String(fileHtml);
-    String result = "<table>";
+    if(LittleFS.exists("/fs.html")) {
+      req_sendFile(request, "/fs.html", "text/html");
+      return;
+    }
+    req_send(request, 200, "text/html", String(fileHtml));
+  });
+
+  // Files list (used by '/fs')
+  authOn("/filelist", HTTP_GET, [](SidekickRequest request) {
+    String result = "{ \"list\": [";
+    String sep = "";
     #ifdef ESP8266
       Dir root = LittleFS.openDir("/");
       while (root.next()) {
         File file = root.openFile("r");
         if(String(root.fileName()) != "config.bin") {
-          result += String("<tr><td class='fdel' onclick='fdel(\"" + String(root.fileName()) + "\")'>[del]</td><td>") + String(root.fileName()) + String("</td><td>") + String(file.size()) + String("</td></tr>");
+          result += sep + String("{ \"file\": \"") + String(root.fileName() + "\", \"size\": ") + String(file.size()) + String("}"));
+          sep = ",";
         }
         file.close();
       }
@@ -276,14 +286,15 @@ void configServerInit() {
         File file = root.openNextFile();
         while (file) {
           if(String(file.name()) != "config.bin") {
-            result += String("<tr><td class='fdel' onclick='fdel(\"" + String(file.name()) + "\")'>[del]</td><td>") + String(file.name()) + String("</td><td>") + String(file.size()) + String("</td></tr>");
+            result += sep + String("{ \"file\": \"") + String(file.name()) + String("\", \"size\": ") + String(file.size()) + String("}");
+            sep = ",";
           }
           file = root.openNextFile();
         }
       }
     #endif
-    result += "</table></div></body></html>";
-    req_send(request, 200, "text/html", fsIndex + result);
+    result += "]}";
+    req_send(request, 200, "application/json", result);
   });
 
   // File upload
