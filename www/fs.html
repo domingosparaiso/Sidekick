@@ -2,7 +2,10 @@
 <head>
  <link rel="stylesheet" href="style.css">
  <style>
-  .fdel { cursor:pointer; color:red; }
+	.filelist {
+		background-color: #505058;
+		border-bottom: 1px solid #000000;
+	}
  </style>
 </head>
 <body>
@@ -58,9 +61,9 @@ fetch('/filelist', {
 	return response.json();
 })
 .then(data => {
-	result = '<table border=0>';
+	result = '<table border=0 class=\"filelist\">';
 	for(item of data.list) {
-		result += "<tr><td class='fdel' onclick='fdel(\"" + item.file + "\")'>[del]</td><td>" + item.file + "</td><td>" + item.size + "</td></tr>";
+		result += "<tr><td><img style=\"cursor:pointer\" onclick='fdel(\"" + item.file + "\")' src='trash.png'></td><td>" + item.file + "</td><td>" + item.size + "</td></tr>";
 	}
 	document.getElementById('filelist').innerHTML = result + "</table>";
 })

@@ -49,11 +49,19 @@ function reboot() {
 					if(timeoutb == 0) location.reload();
 				} else {
 					msg = '<h1>Reloading...</h1>';
+					ip = '';
+					sep = '';
+					for(i=1;i<=4;c++) {
+						ip += sep + document.getElementById('CLI_IP_' + i).value;
+						sep = '.';
+					}
+					window.location.href="http://" + ip;
 				}
 				document.getElementById('bodydiv').innerHTML = out + msg;
 				timeoutb--;
 			}, 1000);
-	}).catch(err => console.error(err));
+		})
+		.catch(err => console.error(err));
 }
 
 function filesystem() {
@@ -126,30 +134,32 @@ function update_led_hdd() {
 	update_led('hdd');
 }
 
-function make_buttons(data_buttons, data_leds) {
+function make_buttons(data_relays, data_leds) {
 	var result = "";
-	var powerButton = false;
-	if(data_buttons != undefined) {
-		for(i = 0; i < data_buttons.length; i++) {
-			value = data_buttons[i];
-			if(value == 'power') powerButton = true;
-			result += "<div class='control-button' onclick=button_action('" + value + "')><img src='power.png' width=32 height=32></div>";
-		}
-	}
 	if(data_leds != undefined) {
 		for(i = 0; i < data_leds.length; i++) {
 			value = data_leds[i];
 			result += "<div class='control-led led_OFF' id='led_" + value + "'>OFF</div>";
 			switch(value) {
 				case 'power':
-					setInterval(function () { update_led_power(); }, 1000);
-					if(!powerButton) {
-						result += "<div class='control-button' onclick=button_action('" + value + "')><img src='power.png' width=50px height=50px></div>";
-					}
+					update_led('power'); // initial led state
+					setInterval(function () { update_led_power(); }, 1000); // update
 					break;
 				case 'hdd':
-					setInterval(function () { update_led_hdd(); }, 1000);
+					update_led('hdd'); // initial led state
+					setInterval(function () { update_led_hdd(); }, 1000); // update
 					break;
+			}
+		}
+	}
+	if(data_relays != undefined) {
+		for(i = 0; i < data_relays.length; i++) {
+			value = data_relays[i];
+			if(value == 'power') {
+				result += "<div class='control-button' onclick=button_action('" + value + "')><img src='power.png' width=32 height=32></div>";
+			}
+			if(value == 'reset') {
+				result += "<div class='control-button' onclick=button_action('" + value + "')><img src='reset.png' width=32 height=32></div>";
 			}
 		}
 	}
@@ -181,7 +191,8 @@ function update_resources(data) {
 		document.getElementById('no-hardware').style.display = 'none';
 		document.getElementById('temperature-table').style.display = 'block';
 	}
-	document.getElementById('menu-console-button').style.display = (data.console != undefined) ? 'block' : 'none';
+	const consolebtn = document.getElementById('menu-console-button');
+	if(consolebtn) consolebtn.style.display = (data.console != undefined) ? 'block' : 'none';
 	Htable = "<table>" +
 		"<tr><td>Serial</td><td>" + data.serialNumber + "</td></tr>" +
 		"<tr><td>Version</td><td>" + data.version + "</td></tr>" +
@@ -197,7 +208,10 @@ function update_resources(data) {
 		temperature +
 		"</table>";
 	document.getElementById('configuration-table').innerHTML = Htable;
-	document.getElementById('control-contents').innerHTML = make_buttons(data.button, data.led);
+	document.getElementById('control-contents').innerHTML = make_buttons(data.relay, data.led);
+	if(data.serialconsole.startsWith('yes')) {
+		lazyload();
+	}
 }
 
 function update_page() {
@@ -267,6 +281,61 @@ function logout() {
 	.then(response => {
 		if (!response.ok) throw new Error(`Erro: ${response.status}`);
 		window.location.href = '/';
+	});
+}
+
+lazyLoaded = false;
+
+function lazyload() {
+	// Lazy load of scripts and css only when console serial is enabled
+	// https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css
+	// https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js
+	// https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js
+	if(lazyLoaded) return Promise.resolve();
+	lazyLoaded = true;
+
+	const link = document.createElement('link');
+	link.rel = 'stylesheet';
+	link.href = 'xterm.css';
+	document.head.appendChild(link);
+
+	return new Promise((resolve) => {
+		const script1 = document.createElement('script');
+		script1.src = 'xterm.js';
+		script1.onload = () => {
+			const script2 = document.createElement('script');
+			script2.src = 'xterm-addon-fit.js';
+			script2.onload = resolve;
+			document.head.appendChild(script2);
+		};
+		document.head.appendChild(script1);
+	});
+}
+
+let modalCallback = null;
+
+function showConfirm(message, callback) {
+	document.getElementById('confirmMessage').innerHTML = message;
+	modalCallback = callback;
+	document.getElementById('confirmModal').classList.add('modal-show');
+}
+
+function modalConfirm() {
+	document.getElementById('confirmModal').classList.remove('modal-show');
+	if(modalCallback) {
+		modalCallback();
+	}
+	modalCallback = null;
+}
+
+function modalCancel() {
+	document.getElementById('confirmModal').classList.remove('modal-show');
+	modalCallback = null;
+}
+
+function confirmReboot() {
+	showConfirm('This will reboot the device, confirm?', function() {
+		reboot();
 	});
 }
 

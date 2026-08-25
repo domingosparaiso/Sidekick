@@ -272,7 +272,7 @@ void configServerInit() {
       while (root.next()) {
         File file = root.openFile("r");
         if(String(root.fileName()) != "config.bin") {
-          result += sep + String("{ \"file\": \"") + String(root.fileName() + "\", \"size\": ") + String(file.size()) + String("}"));
+          result += sep + String("{ \"file\": \"") + String(root.fileName()) + String("\", \"size\": ") + String(file.size()) + String("}");
           sep = ",";
         }
         file.close();
