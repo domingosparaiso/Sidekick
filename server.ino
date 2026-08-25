@@ -369,4 +369,6 @@ void server_loop() {
   reboot_check();
   // pump the Console UART<->WebSocket bridge (ESP32 only)
   hostconsole_loop();
+  // push LED status changes over WebSocket (ESP32 only)
+  led_loop();
 }

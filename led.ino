@@ -3,6 +3,15 @@
 #include "cookie.h"
 // Read LED pins from PC motherboard, used to check if the PC is on and if HDD still in use
 
+// Push led status to the web UI over a WebSocket, only when a value actually changes,
+// instead of the browser polling /led/power and /led/hdd every second.
+// Needs a WebSocket, so it only exists on ESP32 (ESPAsyncWebServer); ESP8266 builds
+// keep the synchronous ESP8266WebServer, which has no WebSocket support. The /led/*
+// HTTP endpoints below still work on ESP8266, they're just not pushed automatically.
+#ifdef ESP32
+AsyncWebSocket ledSocket("/led-ws");
+#endif
+
 // Setup LED pins
 void led_init() {
   resourcesHeader("LED");
@@ -41,5 +50,36 @@ void led_register() {
   authOn("/led/hdd", HTTP_GET, [](SidekickRequest request) {
     req_send(request, 200, "application/json", "{ \"led_hdd\": \"" + String(led_hdd()?"ON":"OFF") + "\"}");
   });
+  #endif
+  #ifdef ESP32
+    server.addHandler(&ledSocket);
+  #endif
+}
+
+// Poll the LED pins and broadcast to connected clients only when a value flips,
+// called from server_loop() (ESP32 only, see comment at the top of this file)
+void led_loop() {
+  #ifdef ESP32
+    #ifdef LED_POWER_PIN
+      static bool firstPower = true;
+      static bool lastPower = false;
+      bool power = led_power();
+      if(firstPower || power != lastPower) {
+        ledSocket.textAll("{ \"led_power\": \"" + String(power?"ON":"OFF") + "\"}");
+        lastPower = power;
+        firstPower = false;
+      }
+    #endif
+    #ifdef LED_HDD_PIN
+      static bool firstHdd = true;
+      static bool lastHdd = false;
+      bool hdd = led_hdd();
+      if(firstHdd || hdd != lastHdd) {
+        ledSocket.textAll("{ \"led_hdd\": \"" + String(hdd?"ON":"OFF") + "\"}");
+        lastHdd = hdd;
+        firstHdd = false;
+      }
+    #endif
+    ledSocket.cleanupClients();
   #endif
 }

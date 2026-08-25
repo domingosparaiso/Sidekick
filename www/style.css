@@ -67,6 +67,13 @@ img[src='logo.jpg']:hover {
 	box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
 }
 
+.group-ctrl {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
 .tab-menu {
 	display: none;
 }

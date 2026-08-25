@@ -111,27 +111,37 @@ function button_action(button_name) {
 	fetch('/relay/' + button_name + "?cmd=" + cmd);
 }
 
+function apply_led(name, out) {
+	el = document.getElementById('led_' + name);
+	if(!el) return;
+	if(out == 'ON') delclass = 'led_OFF';
+	if(out == 'OFF') delclass = 'led_ON';
+	if(el.classList.contains(delclass)) el.classList.remove(delclass);
+	el.classList.add('led_' + out);
+	el.innerHTML = out;
+	if(name == 'power') led_power = out;
+}
+
 function update_led(name) {
 	fetch('/led/' + name)
 		.then(x => x.json())
-		.then((j) => {
-			out = j['led_' + name];
-			if(out == 'ON') delclass = 'led_OFF';
-			if(out == 'OFF') delclass = 'led_ON';
-			el = document.getElementById('led_' + name);
-			if(el.classList.contains(delclass)) el.classList.remove(delclass);
-			el.classList.add('led_' + out);
-			el.innerHTML = out;
-			if(name == 'power') led_power = out;
-		}).catch(err => console.error(err));
+		.then((j) => apply_led(name, j['led_' + name]))
+		.catch(err => console.error(err));
 }
 
-function update_led_power() {
-	update_led('power');
-}
+ledWs = null;
+ledStarted = false;
 
-function update_led_hdd() {
-	update_led('hdd');
+function led_connect() {
+	ledWs = new WebSocket('ws://' + location.host + '/led-ws');
+	ledWs.onmessage = (event) => {
+		data = {};
+		try { data = JSON.parse(event.data); } catch(err) { return; }
+		if(data.led_power != undefined) apply_led('power', data.led_power);
+		if(data.led_hdd != undefined) apply_led('hdd', data.led_hdd);
+	};
+	ledWs.onclose = () => setTimeout(led_connect, 2000);
+	ledWs.onerror = () => ledWs.close();
 }
 
 function make_buttons(data_relays, data_leds) {
@@ -139,28 +149,32 @@ function make_buttons(data_relays, data_leds) {
 	if(data_leds != undefined) {
 		for(i = 0; i < data_leds.length; i++) {
 			value = data_leds[i];
-			result += "<div class='control-led led_OFF' id='led_" + value + "'>OFF</div>";
-			switch(value) {
-				case 'power':
-					update_led('power'); // initial led state
-					setInterval(function () { update_led_power(); }, 1000); // update
-					break;
-				case 'hdd':
-					update_led('hdd'); // initial led state
-					setInterval(function () { update_led_hdd(); }, 1000); // update
-					break;
+			if(value == 'power') {
+				txt = "POWER";
 			}
+			if(value == 'hdd') {
+				txt = "HDD";
+			}
+			result += "<div class='group-ctrl'><div class='control-led led_OFF' id='led_" + value + "'>OFF</div><div>" + txt + "</div></div>";
+			update_led(value); // initial led state, further updates arrive over the '/led-ws' websocket
+		}
+		if(data_leds.length > 0 && !ledStarted) {
+			ledStarted = true;
+			led_connect();
 		}
 	}
 	if(data_relays != undefined) {
 		for(i = 0; i < data_relays.length; i++) {
 			value = data_relays[i];
 			if(value == 'power') {
-				result += "<div class='control-button' onclick=button_action('" + value + "')><img src='power.png' width=32 height=32></div>";
+				img = "power.png";
+				txt = "POWER";
 			}
 			if(value == 'reset') {
-				result += "<div class='control-button' onclick=button_action('" + value + "')><img src='reset.png' width=32 height=32></div>";
+				img = "reset.png";
+				txt = "RESET";
 			}
+			result += "<div class='group-ctrl'><div class='control-button' onclick=button_action('" + value + "')><img src='" + img + "' width=32 height=32></div><div>" + txt + "</div></div>";
 		}
 	}
 	return(result);

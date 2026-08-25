@@ -15,12 +15,15 @@
 // forward declaration on the ESP8266 build, where those types don't exist.
 
 #ifdef ESP32
+#ifdef HOST_SERIAL
 AsyncWebSocket hostConsoleSocket("/console-ws");
+#endif
 #endif
 
 // Setup HOST_SERIAL and announce the resource, called from Sidekick.ino::setup()
 void hostconsole_init() {
   #ifdef ESP32
+  #ifdef HOST_SERIAL
     resourcesAddValue("console", "websocket");
     HOST_SERIAL.begin(HOST_BAUD);
     hostConsoleSocket.onEvent([](AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
@@ -33,18 +36,22 @@ void hostconsole_init() {
       }
     });
   #endif
+  #endif
 }
 
 // Attach the WebSocket to the webserver, called from configServerInit()
 void hostconsole_register() {
   #ifdef ESP32
+  #ifdef HOST_SERIAL
     server.addHandler(&hostConsoleSocket);
+  #endif
   #endif
 }
 
 // Forward anything received on HOST_SERIAL to connected browsers, called from server_loop()
 void hostconsole_loop() {
   #ifdef ESP32
+  #ifdef HOST_SERIAL
     static uint8_t buf[512];
     size_t len = 0;
     while (HOST_SERIAL.available() && len < sizeof(buf)) {
@@ -52,5 +59,6 @@ void hostconsole_loop() {
     }
     if (len > 0) hostConsoleSocket.binaryAll(buf, len);
     hostConsoleSocket.cleanupClients();
+  #endif
   #endif
 }
